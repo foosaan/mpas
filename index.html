@@ -55,9 +55,6 @@
             🏛️ Heritage Kotagede
           </div>
         </div>
-        <button class="btn-toggle-sidebar" id="toggleSidebar" title="Toggle Sidebar">
-          ☰
-        </button>
       </div>
     </header>
 
@@ -66,6 +63,10 @@
 
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
+        <!-- Google Maps Style Toggle Button -->
+        <button class="gmaps-toggle-btn" id="toggleSidebar" title="Toggle Sidebar">
+          ◀
+        </button>
 
         <!-- Search -->
         <div class="search-container">
@@ -96,8 +97,6 @@
         <div class="sidebar-footer"
           style="padding: 15px; margin-top: auto; border-top: 1px solid #eee; text-align: center; font-size: 0.8rem; color: #888;">
           <p>© 2024 Kampung Wisata Purbayan</p>
-          <a href="admin.html" style="color: #888; text-decoration: none; margin-top: 5px; display: inline-block;">⚙️
-            Admin Panel</a>
         </div>
       </aside>
 
@@ -176,16 +175,14 @@
 
     </main>
 
-  </div>
+    <!-- Leaflet.js -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-  <!-- Leaflet.js -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-  <!-- Scripts -->
-  <script src="js/data.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/app.js"></script>
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
 </body>
 
 </html>

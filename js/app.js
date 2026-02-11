@@ -230,4 +230,15 @@ function fitToMarkers() {
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
+
+    // Safety fallback: Ensure loading overlay is hidden even if map init has issues
+    setTimeout(() => {
+        const loading = document.getElementById('loadingOverlay');
+        if (loading) {
+            loading.style.opacity = '0';
+            setTimeout(() => {
+                loading.style.display = 'none';
+            }, 500);
+        }
+    }, 2000); // 2 second max loading time
 });

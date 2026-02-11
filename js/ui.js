@@ -180,8 +180,8 @@ function renderLocationList() {
         id="card-${loc.id}"
         onclick="focusLocation(${loc.id})"
         style="animation-delay: ${index * 0.05}s">
-        <div class="location-card-icon" style="background: ${cat.color}15;">
-          <span>${cat.icon}</span>
+        <div class="location-card-icon" style="color: ${cat.color};">
+          ${cat.icon}
         </div>
         <div class="location-card-content">
           <div class="location-card-name">${loc.name}</div>
@@ -221,10 +221,8 @@ function openDetailPanel(location) {
     const headerBg = panel.querySelector('.detail-panel-header-bg');
     if (location.image) {
         headerBg.style.backgroundImage = `url(${location.image})`;
-        headerBg.style.opacity = '0.4';
     } else {
         headerBg.style.backgroundImage = 'none';
-        headerBg.style.opacity = '0';
     }
 
     // Category badge
@@ -280,7 +278,6 @@ function openDetailPanel(location) {
     // Directions button
     const directionsBtn = panel.querySelector('.btn-directions');
     directionsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`;
-    directionsBtn.target = '_blank';
 
     // Open panel
     panel.classList.add('open');
@@ -298,14 +295,21 @@ function closeDetailPanel() {
 function setupSidebarToggle() {
     const toggleBtn = document.getElementById('toggleSidebar');
     if (toggleBtn) {
-        toggleBtn.addEventListener('click', toggleSidebar);
-    }
-}
+        toggleBtn.addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
 
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar) {
-        sidebar.classList.toggle('collapsed');
+            // Toggle arrow icon
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            toggleBtn.textContent = isCollapsed ? '▶' : '◀';
+
+            // Trigger map resize after transition
+            setTimeout(() => {
+                if (typeof map !== 'undefined' && map) {
+                    map.invalidateSize();
+                }
+            }, 350); // wait for 0.3s transition
+        });
     }
 }
 
