@@ -110,11 +110,20 @@ function addMarkers() {
             autoPan: true
         });
 
-        // Marker click
-        marker.on('click', () => {
+        // Marker click handler
+        const onMarkerClick = (e) => {
+            // Prevent double firing if both events trigger
+            if (e && e.originalEvent && e.originalEvent.type === 'touchstart') {
+                L.DomEvent.stopPropagation(e);
+            }
             setActiveMarker(marker);
             setActiveCard(location.id);
-        });
+        };
+
+        marker.on('click visible', onMarkerClick);
+
+        // Touch support for mobile devices
+        marker.on('touchstart', onMarkerClick); // Direct touch handler
 
         // Marker hover
         marker.on('mouseover', () => {
