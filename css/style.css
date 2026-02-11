@@ -968,6 +968,13 @@ body {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
+/* === Custom Map Marker === */
+.custom-marker {
+  cursor: pointer;
+  z-index: 400 !important;
+  /* Ensure markers are clickable */
+}
+
 /* === Custom Map Popup === */
 .leaflet-popup-content-wrapper {
   background: var(--white);

@@ -49,7 +49,8 @@ function initMap() {
         center: [PURBAYAN_CENTER.lat, PURBAYAN_CENTER.lng],
         zoom: DEFAULT_ZOOM,
         zoomControl: false,
-        attributionControl: true
+        attributionControl: true,
+        tap: false // Fix for iOS click issues
     });
 
     // Add zoom control to the right
