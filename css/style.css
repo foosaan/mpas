@@ -531,6 +531,8 @@ body {
 #map {
   width: 100%;
   height: 100%;
+  touch-action: none;
+  /* Improve touch handling */
 }
 
 /* Map Legend */

@@ -111,19 +111,50 @@ function addMarkers() {
         });
 
         // Marker click handler
+        // Marker click handler
+        let lastClickTime = 0;
         const onMarkerClick = (e) => {
-            // Prevent double firing if both events trigger
-            if (e && e.originalEvent && e.originalEvent.type === 'touchstart') {
-                L.DomEvent.stopPropagation(e);
-            }
+            const now = Date.now();
+            if (now - lastClickTime < 500) return; // Debounce to prevent double-fire
+            lastClickTime = now;
+
+            L.DomEvent.stopPropagation(e);
+            marker.openPopup(); // Explicitly open popup
             setActiveMarker(marker);
             setActiveCard(location.id);
         };
 
-        marker.on('click visible', onMarkerClick);
+        // Standard click
+        marker.on('click', onMarkerClick);
 
-        // Touch support for mobile devices
-        marker.on('touchstart', onMarkerClick); // Direct touch handler
+        // Manual Tap Detection for iOS
+        let touchStartTime;
+        let touchStartPos;
+
+        marker.on('touchstart', (e) => {
+            touchStartTime = Date.now();
+            touchStartPos = e.originalEvent.touches[0];
+        });
+
+        marker.on('touchend', (e) => {
+            if (!touchStartTime || !touchStartPos) return;
+
+            const touchEndTime = Date.now();
+            const touchEndPos = e.originalEvent.changedTouches[0];
+
+            const timeDiff = touchEndTime - touchStartTime;
+            const distX = Math.abs(touchEndPos.screenX - touchStartPos.screenX);
+            const distY = Math.abs(touchEndPos.screenY - touchStartPos.screenY);
+
+            // If tap is short (<300ms) and movement is small (<10px) -> IT'S A TAP!
+            if (timeDiff < 300 && distX < 10 && distY < 10) {
+                onMarkerClick(e);
+            }
+
+            // Reset
+            touchStartTime = null;
+            touchStartPos = null;
+        });
 
         // Marker hover
         marker.on('mouseover', () => {
