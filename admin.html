@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - SIG Kampung Wisata Purbayan</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+
+    <!-- Leaflet.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Admin Specific Styles */
+        body {
+            background-color: #f4f4f5;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-title h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .admin-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background-color: var(--gold);
+            color: white;
+            margin-right: 4px;
+        }
+
+        .btn-delete {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-add {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back {
+            color: var(--text-medium);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .map-picker {
+            height: 300px;
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .text-sm {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login Overlay -->
+    <div id="loginOverlay"
+        style="position: fixed; inset: 0; background: #f4f4f5; z-index: 2000; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+        <div
+            style="text-align: center; max-width: 300px; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: white;">
+            <h2 style="margin-bottom: 20px; color: var(--primary); font-family: 'Playfair Display', serif;">Admin Login
+            </h2>
+            <input type="password" id="pinInput" placeholder="Masukkan PIN"
+                style="width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; text-align: center;">
+            <button onclick="checkPin()"
+                style="width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;">Masuk</button>
+            <p id="errorMsg" style="color: #ef4444; margin-top: 10px; font-size: 0.9rem; display: none;">PIN Salah!</p>
+            <a href="index.html"
+                style="display: block; margin-top: 15px; color: var(--text-light); text-decoration: none; font-size: 0.85rem;">←
+                Kembali ke Peta</a>
+        </div>
+    </div>
+
+    <div class="admin-container" id="adminContent" style="display: none;">
+        <div class="admin-header">
+            <div class="admin-title">
+                <a href="index.html" class="btn-back">← Kembali ke Peta</a>
+                <h1>Admin Dashboard</h1>
+                <p class="text-sm">Kelola data lokasi Kampung Wisata Purbayan</p>
+            </div>
+            <div>
+                <button class="btn-add" onclick="resetData()"
+                    style="background-color: #64748b; margin-right: 10px;">Reset Data</button>
+                <button class="btn-add" onclick="openModal()">+ Tambah Lokasi</button>
+            </div>
+        </div>
+
+        <div class="admin-content">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nama Lokasi</th>
+                        <th>Kategori</th>
+                        <th>Koordinat</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="locationTableBody">
+                    <!-- Data items will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="locationModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle" style="margin-bottom: 20px;">Tambah Lokasi Baru</h2>
+            <form id="locationForm">
+                <input type="hidden" id="locationId">
+
+                <div class="form-group">
+                    <label class="form-label">Nama Lokasi</label>
+                    <input type="text" class="form-control" id="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Kategori</label>
+                    <select class="form-control" id="category" required>
+                        <!-- Categories populated by JS -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Koordinat (Lat, Lng)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" step="any" class="form-control" id="lat" placeholder="Latitude" required>
+                        <input type="number" step="any" class="form-control" id="lng" placeholder="Longitude" required>
+                    </div>
+                    <p class="text-sm">Klik pada peta di bawah untuk memilih lokasi</p>
+                    <div id="mapPicker" class="map-picker"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea class="form-control" id="description" rows="3" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Alamat</label>
+                    <input type="text" class="form-control" id="address" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Jam Operasional</label>
+                    <input type="text" class="form-control" id="openHours"
+                        placeholder="Contoh: Senin - Minggu: 08.00 - 17.00">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">URL Gambar (Opsional)</label>
+                    <input type="url" class="form-control" id="image" placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="action-btn" onclick="closeModal()"
+                        style="background: #e2e8f0; padding: 10px 20px;">Batal</button>
+                    <button type="submit" class="btn-add">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Valid Data & Admin Logic -->
+    <script src="js/data.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

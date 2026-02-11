@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Sistem Informasi Geografis Pemetaan Kampung Wisata Purbayan, Kotagede, Yogyakarta. Jelajahi lokasi wisata heritage, kerajinan perak, kuliner khas, dan budaya Kotagede.">
+  <meta name="keywords"
+    content="SIG, GIS, Kampung Wisata Purbayan, Kotagede, Yogyakarta, Wisata Heritage, Kerajinan Perak, Peta Wisata">
+  <meta name="author" content="SIG Purbayan">
+
+  <title>SIG Kampung Wisata Purbayan | Kotagede, Yogyakarta</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
+
+  <!-- Leaflet.js CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Memuat Peta Wisata...</div>
+    <div class="loading-sub">Kampung Wisata Purbayan, Kotagede</div>
+  </div>
+
+  <!-- App Container -->
+  <div class="app-container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-brand">
+        <div class="header-logo">🗺️</div>
+        <div class="header-title">
+          <h1>Kampung Wisata Purbayan</h1>
+          <span>Kotagede, Yogyakarta — Sistem Informasi Geografis</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="header-stats">
+          <div class="stat-badge">
+            📍 Lokasi Wisata
+            <span class="count" id="totalLocations">0</span>
+          </div>
+          <div class="stat-badge">
+            🏛️ Heritage Kotagede
+          </div>
+        </div>
+        <button class="btn-toggle-sidebar" id="toggleSidebar" title="Toggle Sidebar">
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+
+        <!-- Search -->
+        <div class="search-container">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Cari lokasi wisata..." autocomplete="off">
+            <button class="clear-search" id="clearSearch" title="Hapus pencarian">✕</button>
+          </div>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="filter-container">
+          <div class="filter-label">Filter Kategori</div>
+          <div class="filter-buttons" id="filterButtons">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Location List -->
+        <div class="location-list-container">
+          <div class="location-count" id="locationCount">Memuat...</div>
+          <div id="locationList">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+
+        <div class="sidebar-footer"
+          style="padding: 15px; margin-top: auto; border-top: 1px solid #eee; text-align: center; font-size: 0.8rem; color: #888;">
+          <p>© 2024 Kampung Wisata Purbayan</p>
+          <a href="admin.html" style="color: #888; text-decoration: none; margin-top: 5px; display: inline-block;">⚙️
+            Admin Panel</a>
+        </div>
+      </aside>
+
+      <!-- Map -->
+      <div class="map-container">
+        <div id="map"></div>
+
+        <!-- Map Legend -->
+        <div class="map-legend">
+          <div class="legend-header">
+            <h4>🗺️ Legenda Peta</h4>
+            <button class="legend-toggle">▼</button>
+          </div>
+          <div class="legend-body">
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--cat-heritage);"></span>
+              <span>Cagar Budaya & Heritage</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--cat-perak);"></span>
+              <span>Kerajinan Perak</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--cat-kuliner);"></span>
+              <span>Kuliner & Jajanan</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--cat-penginapan);"></span>
+              <span>Homestay & Penginapan</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--cat-senibudaya);"></span>
+              <span>Seni & Budaya</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--cat-fasilitas);"></span>
+              <span>Fasilitas Umum</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="detail-panel" id="detailPanel">
+          <div class="detail-panel-header">
+            <div class="detail-panel-header-bg"></div>
+            <button class="detail-close-btn" onclick="closeDetailPanel()">✕</button>
+            <div class="detail-panel-header-content">
+              <div class="detail-category-badge"></div>
+              <h2 class="detail-panel-name"></h2>
+            </div>
+          </div>
+          <div class="detail-body">
+            <div class="detail-section">
+              <h4>📝 Deskripsi</h4>
+              <p class="detail-description"></p>
+            </div>
+            <div class="detail-section">
+              <h4>ℹ️ Informasi</h4>
+              <div class="detail-info-grid"></div>
+            </div>
+            <div class="detail-section">
+              <h4>🏷️ Tags</h4>
+              <div class="detail-tags"></div>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <a class="btn-detail btn-directions" href="#" target="_blank">
+              🧭 Petunjuk Arah
+            </a>
+            <button class="btn-detail btn-share" onclick="shareLocation()">
+              📤 Bagikan
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Leaflet.js -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>

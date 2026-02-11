@@ -1,0 +1,233 @@
+/**
+ * SIG Pemetaan Kampung Wisata Purbayan
+ * Main Application - Leaflet.js + OpenStreetMap Integration
+ */
+
+let map;
+let markers = [];
+let markersLayer;
+let activeMarker = null;
+
+// Category icons using Leaflet divIcon with colored markers
+function createMarkerIcon(color, icon, isActive = false) {
+    const size = isActive ? 48 : 38;
+    const fontSize = isActive ? 18 : 15;
+    return L.divIcon({
+        className: 'custom-marker',
+        html: `
+      <div style="
+        width: ${size}px;
+        height: ${size}px;
+        background: ${color};
+        border-radius: 50% 50% 50% 4px;
+        transform: rotate(-45deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.35);
+        border: 3px solid white;
+        transition: all 0.2s ease;
+        ${isActive ? 'filter: brightness(1.15); box-shadow: 0 4px 20px rgba(0,0,0,0.45);' : ''}
+      ">
+        <span style="
+          transform: rotate(45deg);
+          font-size: ${fontSize}px;
+          line-height: 1;
+        ">${icon}</span>
+      </div>
+    `,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size],
+        popupAnchor: [0, -size + 8]
+    });
+}
+
+// Initialize the map
+function initMap() {
+    // Create Leaflet map
+    map = L.map('map', {
+        center: [PURBAYAN_CENTER.lat, PURBAYAN_CENTER.lng],
+        zoom: DEFAULT_ZOOM,
+        zoomControl: false,
+        attributionControl: true
+    });
+
+    // Add zoom control to the right
+    L.control.zoom({ position: 'topright' }).addTo(map);
+
+    // OpenStreetMap tile layer with warm-toned style
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | SIG Kampung Wisata Purbayan',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Create markers layer group
+    markersLayer = L.layerGroup().addTo(map);
+
+    // Add markers
+    addMarkers();
+
+    // Map click - close panels
+    map.on('click', () => {
+        closeDetailPanel();
+        clearActiveCard();
+        resetActiveMarker();
+    });
+
+    // Hide loading overlay
+    setTimeout(() => {
+        const loading = document.getElementById('loadingOverlay');
+        if (loading) loading.classList.add('hidden');
+    }, 800);
+}
+
+// Add markers to map
+function addMarkers() {
+    markers = [];
+    markersLayer.clearLayers();
+
+    LOCATIONS.forEach((location, index) => {
+        const category = CATEGORIES[location.category];
+        const icon = createMarkerIcon(category.markerColor, category.icon);
+
+        const marker = L.marker([location.lat, location.lng], {
+            icon: icon,
+            title: location.name,
+            riseOnHover: true
+        });
+
+        // Store additional data on marker
+        marker.locationData = location;
+        marker.categoryData = category;
+
+        // Create popup content
+        const popupContent = createPopupContent(location, category);
+        marker.bindPopup(popupContent, {
+            maxWidth: 300,
+            className: 'custom-popup',
+            closeButton: true,
+            autoPan: true
+        });
+
+        // Marker click
+        marker.on('click', () => {
+            setActiveMarker(marker);
+            setActiveCard(location.id);
+        });
+
+        // Marker hover
+        marker.on('mouseover', () => {
+            if (marker !== activeMarker) {
+                marker.setIcon(createMarkerIcon(category.markerColor, category.icon, true));
+            }
+        });
+
+        marker.on('mouseout', () => {
+            if (marker !== activeMarker) {
+                marker.setIcon(createMarkerIcon(category.markerColor, category.icon, false));
+            }
+        });
+
+        // Staggered animation
+        setTimeout(() => {
+            markersLayer.addLayer(marker);
+        }, index * 60);
+
+        markers.push(marker);
+    });
+}
+
+// Create popup content
+function createPopupContent(location, category) {
+    return `
+    <div class="info-window">
+      <div class="info-window-category" style="background-color: ${category.markerColor}">
+        <span>${category.icon}</span>
+        <span>${category.name}</span>
+      </div>
+      <h3>${location.name}</h3>
+      <p>${location.description}</p>
+      <button class="info-window-btn" onclick="openDetailFromInfo(${location.id})">
+        📋 Lihat Detail Lengkap
+      </button>
+    </div>
+  `;
+}
+
+// Set active marker
+function setActiveMarker(marker) {
+    resetActiveMarker();
+    const category = marker.categoryData;
+    marker.setIcon(createMarkerIcon(category.markerColor, category.icon, true));
+    activeMarker = marker;
+}
+
+// Reset active marker
+function resetActiveMarker() {
+    if (activeMarker) {
+        const cat = activeMarker.categoryData;
+        activeMarker.setIcon(createMarkerIcon(cat.markerColor, cat.icon, false));
+        activeMarker = null;
+    }
+}
+
+// Open detail from popup button
+function openDetailFromInfo(locationId) {
+    const location = LOCATIONS.find(l => l.id === locationId);
+    if (location) {
+        map.closePopup();
+        openDetailPanel(location);
+    }
+}
+
+// Show/hide markers by category
+function filterMarkers(categoryFilter) {
+    markersLayer.clearLayers();
+
+    markers.forEach(marker => {
+        if (categoryFilter === 'all' || marker.locationData.category === categoryFilter) {
+            markersLayer.addLayer(marker);
+        }
+    });
+}
+
+// Focus on a specific location
+function focusLocation(locationId) {
+    const marker = markers.find(m => m.locationData.id === locationId);
+    if (marker) {
+        // Show marker if hidden
+        if (!markersLayer.hasLayer(marker)) {
+            markersLayer.addLayer(marker);
+        }
+
+        // Zoom and pan
+        map.setView(marker.getLatLng(), 18, { animate: true });
+
+        // Open popup
+        setTimeout(() => {
+            marker.openPopup();
+            setActiveMarker(marker);
+        }, 300);
+
+        // Close sidebar on mobile
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.add('collapsed');
+        }
+    }
+}
+
+// Fit map to show all visible markers
+function fitToMarkers() {
+    const layers = [];
+    markersLayer.eachLayer(layer => layers.push(layer));
+
+    if (layers.length > 0) {
+        const group = L.featureGroup(layers);
+        map.fitBounds(group.getBounds().pad(0.1), { animate: true });
+    }
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+});
