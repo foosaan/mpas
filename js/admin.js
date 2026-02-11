@@ -57,6 +57,21 @@ function showAdminContent() {
     document.getElementById('adminContent').style.display = 'block';
 }
 
+// Toggle New Category Inputs
+function toggleNewCategory() {
+    const select = document.getElementById('category');
+    const group = document.getElementById('newCategoryGroup');
+    if (select.value === 'new') {
+        group.style.display = 'block';
+        document.getElementById('newCatName').required = true;
+        document.getElementById('newCatColor').required = true;
+    } else {
+        group.style.display = 'none';
+        document.getElementById('newCatName').required = false;
+        document.getElementById('newCatColor').required = false;
+    }
+}
+
 function renderTable() {
     const tbody = document.getElementById('locationTableBody');
     tbody.innerHTML = '';
@@ -65,12 +80,13 @@ function renderTable() {
     const sortedLocations = [...LOCATIONS].sort((a, b) => b.id - a.id);
 
     sortedLocations.forEach(loc => {
-        const categoryName = CATEGORIES[loc.category] ? CATEGORIES[loc.category].name : loc.category;
+        // Fallback if category was deleted or missing
+        const catData = CATEGORIES[loc.category] || { name: loc.category, color: '#ccc' };
 
         const row = document.createElement('tr');
         row.innerHTML = `
       <td><strong>${loc.name}</strong></td>
-      <td><span class="category-badge" style="background:${CATEGORIES[loc.category]?.color || '#ccc'}; color:white; padding: 2px 8px; border-radius: 4px; font-size: 0.8em;">${categoryName}</span></td>
+      <td><span class="category-badge" style="background:${catData.color}; color:white; padding: 2px 8px; border-radius: 4px; font-size: 0.8em;">${catData.name}</span></td>
       <td>${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}</td>
       <td>
         <button class="action-btn btn-edit" onclick="editLocation(${loc.id})">Edit</button>
@@ -91,6 +107,14 @@ function populateCategories() {
         option.textContent = CATEGORIES[key].name;
         select.appendChild(option);
     }
+
+    // Add "New Category" option
+    const newOption = document.createElement('option');
+    newOption.value = 'new';
+    newOption.textContent = '+ Buat Kategori Baru...';
+    newOption.style.fontWeight = 'bold';
+    newOption.style.color = 'var(--primary)';
+    select.appendChild(newOption);
 }
 
 function initMap() {
@@ -142,6 +166,7 @@ function openModal(isEdit = false) {
 function closeModal() {
     document.getElementById('locationModal').classList.remove('active');
     document.getElementById('locationForm').reset();
+    document.getElementById('newCategoryGroup').style.display = 'none';
     currentId = null;
     if (marker) {
         map.removeLayer(marker);
@@ -160,7 +185,17 @@ function editLocation(id) {
     // Fill form
     document.getElementById('locationId').value = loc.id;
     document.getElementById('name').value = loc.name;
-    document.getElementById('category').value = loc.category;
+
+    // Check if category exists, if not default to first
+    if (CATEGORIES[loc.category]) {
+        document.getElementById('category').value = loc.category;
+    } else {
+        // Handle cases where category id might be old
+        document.getElementById('category').value = Object.keys(CATEGORIES)[0];
+    }
+
+    toggleNewCategory(); // Ensure new category inputs are hidden
+
     document.getElementById('lat').value = loc.lat;
     document.getElementById('lng').value = loc.lng;
     document.getElementById('description').value = loc.description || '';
@@ -187,10 +222,39 @@ function removeLocation(id) {
 function handleFormSubmit(e) {
     e.preventDefault();
 
+    let categoryId = document.getElementById('category').value;
+
+    // Handle New Category Creation
+    if (categoryId === 'new') {
+        const name = document.getElementById('newCatName').value.trim();
+        const color = document.getElementById('newCatColor').value;
+        const icon = document.getElementById('newCatIcon').value.trim() || '📍';
+
+        if (!name) {
+            alert('Nama Kategori tidak boleh kosong!');
+            return;
+        }
+
+        // Generate simple ID
+        const id = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        if (CATEGORIES[id]) {
+            alert('ID Kategori sudah ada!');
+            return;
+        }
+
+        // Add to data
+        addCategory(id, name, color, icon);
+        categoryId = id;
+
+        // Refresh dropdown
+        populateCategories();
+    }
+
     const formData = {
         id: currentId ? parseInt(currentId) : Date.now(),
         name: document.getElementById('name').value,
-        category: document.getElementById('category').value,
+        category: categoryId,
         lat: parseFloat(document.getElementById('lat').value),
         lng: parseFloat(document.getElementById('lng').value),
         description: document.getElementById('description').value,
