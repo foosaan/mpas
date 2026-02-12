@@ -206,13 +206,23 @@ function initMap() {
         maxZoom: 19
     });
 
+    const googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    });
+
+    const googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    });
+
     const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        attribution: 'Tiles &copy; Esri',
         maxZoom: 19
     });
 
     const voyagerLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        attribution: '&copy; CARTO',
         subdomains: 'abcd',
         maxZoom: 19
     });
@@ -221,12 +231,14 @@ function initMap() {
     map = L.map('mapPicker', {
         center: [PURBAYAN_CENTER.lat, PURBAYAN_CENTER.lng],
         zoom: 16,
-        layers: [osmLayer] // Default
+        layers: [googleStreets] // Default: Google
     });
 
     // 3. Add Layer Control
     const baseMaps = {
-        "Peta Jalan": osmLayer,
+        "Google Maps": googleStreets,
+        "Google Satelit": googleHybrid,
+        "OpenStreetMap": osmLayer,
         "Satelit (Esri)": satelliteLayer,
         "Minimalis (Carto)": voyagerLayer
     };
