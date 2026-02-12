@@ -9,55 +9,31 @@ const DEFAULT_ZOOM = 16;
 
 // Data Kategori
 let CATEGORIES = {
-  heritage: {
-    id: 'heritage',
-    name: 'Heritage & Sejarah',
-    icon: '🏛️',
+  wisata: {
+    id: 'wisata',
+    name: 'Wisata Purbayan',
+    icon: '🏛️', // Castle/Heritage icon
     color: '#d97706', // Amber-600
     markerColor: '#d97706',
-    description: 'Situs sejarah dan bangunan cagar budaya'
+    description: 'Situs sejarah, pasar, dan bangunan cagar budaya'
   },
-  perak: {
-    id: 'perak',
-    name: 'Kerajinan Perak',
-    icon: '💍',
-    color: '#475569', // Slate-600
-    markerColor: '#475569',
-    description: 'Pusat kerajinan dan showroom perak'
-  },
-  kuliner: {
-    id: 'kuliner',
-    name: 'Kuliner Khas',
-    icon: '🍽️',
-    color: '#ea580c', // Orange-600
-    markerColor: '#ea580c',
-    description: 'Makanan tradisional dan jajanan pasar'
-  },
-  seni: {
-    id: 'seni',
-    name: 'Seni & Budaya',
-    icon: '🎭',
-    color: '#e11d48', // Rose-600
-    markerColor: '#e11d48',
-    description: 'Batik, busana adat, dan kesenian'
-  },
-  umum: {
-    id: 'umum',
-    name: 'Fasilitas Umum',
-    icon: '📍',
-    color: '#059669', // Emerald-600
-    markerColor: '#059669',
-    description: 'Fasilitas publik dan area parkir'
+  umkm: {
+    id: 'umkm',
+    name: 'UMKM Kampung Wisata',
+    icon: '🛍️',
+    color: '#0284c7', // Sky-600
+    markerColor: '#0284c7',
+    description: 'Pusat oleh-oleh, kerajinan perak, batik, dan kuliner'
   }
 };
 
 // Data Lokasi Real
 let LOCATIONS = [
-  // --- WISATA / HERITAGE ---
+  // --- WISATA PURBAYAN ---
   {
     id: 1,
     name: 'Masjid Gedhe Mataram Kotagede',
-    category: 'heritage',
+    category: 'wisata',
     lat: -7.829462,
     lng: 110.397276,
     description: 'Masjid tertua di Yogyakarta yang dibangun pada masa Kerajaan Mataram Islam. Memiliki arsitektur unik perpaduan Hindu dan Islam.',
@@ -70,7 +46,7 @@ let LOCATIONS = [
   {
     id: 2,
     name: 'Makam Raja-Raja Mataram',
-    category: 'heritage',
+    category: 'wisata',
     lat: -7.829983,
     lng: 110.397457,
     description: 'Kompleks pemakaman pendiri dan raja-raja awal Kerajaan Mataram Islam, termasuk Panembahan Senopati.',
@@ -83,7 +59,7 @@ let LOCATIONS = [
   {
     id: 3,
     name: 'Pasar Kotagede Yogyakarta',
-    category: 'heritage',
+    category: 'wisata',
     lat: -7.827725,
     lng: 110.400512,
     description: 'Pasar tradisional tertua di Yogyakarta yang sduah ada sejak jaman Kerajaan Mataram Islam (Sargede).',
@@ -96,7 +72,7 @@ let LOCATIONS = [
   {
     id: 4,
     name: 'Situs Watu Gilang & Watu Gatheng',
-    category: 'heritage',
+    category: 'wisata',
     lat: -7.826700,
     lng: 110.398500,
     description: 'Batu andesit persegi yang dipercaya sebagai singgasana Panembahan Senopati. Watu Gatheng adalah bola batu yang digunakan untuk latihan fisik prajurit.',
@@ -109,7 +85,7 @@ let LOCATIONS = [
   {
     id: 5,
     name: 'Between Two Gates (Lawang Kembar)',
-    category: 'heritage',
+    category: 'wisata',
     lat: -7.830500,
     lng: 110.398800,
     description: 'Kawasan permukiman tradisional dengan ciri khas gang sempit yang diapit oleh dua gerbang arsitektur kuno.',
@@ -122,7 +98,7 @@ let LOCATIONS = [
   {
     id: 6,
     name: 'Museum KH. Muzakir',
-    category: 'heritage',
+    category: 'wisata',
     lat: -7.826350,
     lng: 110.392000,
     description: 'Museum yang didedikasikan untuk Prof. KH. Abdul Kahar Muzakkir, tokoh pejuang kemerdekaan dan anggota BPUPKI asal Kotagede.',
@@ -135,7 +111,7 @@ let LOCATIONS = [
   {
     id: 7,
     name: 'Situs Jebolan Raden Ronggo',
-    category: 'heritage',
+    category: 'wisata',
     lat: -7.831000,
     lng: 110.398000,
     description: 'Situs bersejarah berupa reruntuhan tembok benteng cepuri yang dijebol oleh Raden Ronggo.',
@@ -148,7 +124,7 @@ let LOCATIONS = [
   {
     id: 8,
     name: 'Regol Hasta Renggo',
-    category: 'heritage',
+    category: 'wisata',
     lat: -7.817000,
     lng: 110.395000,
     description: 'Bangunan pintu gerbang (regol) bersejarah dengan arsitektur khas Jawa-Eropa.',
@@ -158,12 +134,25 @@ let LOCATIONS = [
     openHours: '24 Jam',
     tags: ['heritage', 'wisata', 'regol']
   },
+  {
+    id: 11,
+    name: 'Peken Klangenan Kota Gede',
+    category: 'wisata',
+    lat: -7.828000,
+    lng: 110.400800,
+    description: 'Pasar kuliner tradisional yang menyajikan jajanan lawas dan suasana tempo dulu.',
+    address: 'Area Pasar Kotagede',
+    image: 'https://placehold.co/600x400?text=Peken+Klangenan',
+    phone: '-',
+    openHours: 'Sabtu/Minggu Malam',
+    tags: ['pasar', 'wisata', 'seni', 'kuliner']
+  },
 
-  // --- UMKM / KULINER ---
+  // --- UMKM KAMPUNG WISATA ---
   {
     id: 9,
     name: 'Roti Kembang Waru Eko 521',
-    category: 'kuliner',
+    category: 'umkm',
     lat: -7.828500,
     lng: 110.402000,
     description: 'Roti tradisional khas Kotagede berbentuk bunga Waru. Warisan kuliner sejak zaman Mataram Islam.',
@@ -176,8 +165,8 @@ let LOCATIONS = [
   {
     id: 10,
     name: 'Lenis Camilan Jogja',
-    category: 'kuliner',
-    lat: -7.830200, // Adjusted based on Ndalem Cepuri context
+    category: 'umkm',
+    lat: -7.830200,
     lng: 110.398000,
     description: 'Pusat oleh-oleh camilan khas Jogja dan Kotagede.',
     address: 'Jl. Nyi Adisoro No. 19 Prenggan',
@@ -187,24 +176,9 @@ let LOCATIONS = [
     tags: ['kuliner', 'camilan', 'oleh-oleh', 'umkm']
   },
   {
-    id: 11,
-    name: 'Peken Klangenan Kota Gede',
-    category: 'kuliner',
-    lat: -7.828000,
-    lng: 110.400800,
-    description: 'Pasar kuliner tradisional yang menyajikan jajanan lawas dan suasana tempo dulu.',
-    address: 'Area Pasar Kotagede',
-    image: 'https://placehold.co/600x400?text=Peken+Klangenan',
-    phone: '-',
-    openHours: 'Sabtu/Minggu Malam',
-    tags: ['pasar', 'wisata', 'seni', 'kuliner']
-  },
-
-  // --- PERAK / KERAJINAN ---
-  {
     id: 12,
     name: 'Umi Silver',
-    category: 'perak',
+    category: 'umkm',
     lat: -7.824000,
     lng: 110.399500,
     description: 'Pengrajin dan toko perhiasan perak asli Kotagede dengan desain klasik dan modern.',
@@ -217,8 +191,8 @@ let LOCATIONS = [
   {
     id: 13,
     name: 'Pengrajin Perak Mas Ribut',
-    category: 'perak',
-    lat: -7.822500, // Adjusted to Kampung Basen / North of Market
+    category: 'umkm',
+    lat: -7.822500,
     lng: 110.400500,
     description: 'Workshop pengrajin perak yang melayani pembuatan perhiasan custom.',
     address: 'Kampung Basen, Kotagede',
@@ -227,13 +201,11 @@ let LOCATIONS = [
     openHours: '08.00 - 16.00 WIB',
     tags: ['kerajinan', 'perak', 'umkm']
   },
-
-  // --- SENI / FASHION ---
   {
     id: 14,
     name: 'Blangkon WGO Sinjang Jawi',
-    category: 'seni',
-    lat: -7.831500, // Adjusted near Jl. Ki Pemanahan / Purbayan South
+    category: 'umkm',
+    lat: -7.831500,
     lng: 110.401000,
     description: 'Produksi blangkon dan busana adat Jawa Mataraman berkualitas.',
     address: 'Kotagede',
@@ -245,8 +217,8 @@ let LOCATIONS = [
   {
     id: 15,
     name: 'Creative Batik Kotagede',
-    category: 'seni',
-    lat: -7.827500, // Adjusted to kampung area north of market
+    category: 'umkm',
+    lat: -7.827500,
     lng: 110.401500,
     description: 'Galeri dan workshop batik tulis dengan motif abstrak dan kontemporer.',
     address: 'Purbayan, Kotagede',
@@ -262,19 +234,19 @@ let LOCATIONS = [
 function initData() {
   try {
     // 1. Load Categories
-    const savedCategories = localStorage.getItem('purbayan_categories_v2'); // NEW KEY v2
+    const savedCategories = localStorage.getItem('purbayan_categories_v3'); // NEW KEY v3
     if (savedCategories) {
       CATEGORIES = JSON.parse(savedCategories);
     } else {
-      localStorage.setItem('purbayan_categories_v2', JSON.stringify(CATEGORIES));
+      localStorage.setItem('purbayan_categories_v3', JSON.stringify(CATEGORIES));
     }
 
     // 2. Load Locations
-    const savedLocations = localStorage.getItem('purbayan_locations_v5'); // NEW KEY v5 (Force Update)
+    const savedLocations = localStorage.getItem('purbayan_locations_v6'); // NEW KEY v6 (Force Update)
     if (savedLocations) {
       LOCATIONS = JSON.parse(savedLocations);
     } else {
-      localStorage.setItem('purbayan_locations_v5', JSON.stringify(LOCATIONS));
+      localStorage.setItem('purbayan_locations_v6', JSON.stringify(LOCATIONS));
     }
   } catch (e) {
     console.error('Error initialization data:', e);
@@ -290,13 +262,13 @@ initData();
 // Save Locations
 function saveLocations(data) {
   LOCATIONS = data;
-  localStorage.setItem('purbayan_locations_v5', JSON.stringify(LOCATIONS));
+  localStorage.setItem('purbayan_locations_v6', JSON.stringify(LOCATIONS));
 }
 
 // Save Categories
 function saveCategories(data) {
   CATEGORIES = data;
-  localStorage.setItem('purbayan_categories_v2', JSON.stringify(CATEGORIES));
+  localStorage.setItem('purbayan_categories_v3', JSON.stringify(CATEGORIES));
 }
 
 // Add New Category
@@ -345,8 +317,8 @@ function deleteLocation(id) {
 // Reset data to defaults
 function resetData() {
   if (confirm('Reset data akan mengembalikan Kategori dan Lokasi ke kondisi awal (2 Kategori utama). Lanjutkan?')) {
-    localStorage.removeItem('purbayan_categories_v2');
-    localStorage.removeItem('purbayan_locations_v5');
+    localStorage.removeItem('purbayan_categories_v3');
+    localStorage.removeItem('purbayan_locations_v6');
     location.reload();
   }
 }
