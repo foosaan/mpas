@@ -46,25 +46,10 @@ function createMarkerIcon(color, icon, isActive = false) {
 function initMap() {
     // Create Leaflet map
     // 1. Define Base Layers
+    // 1. Define Base Layers
     const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | foosaan',
         maxZoom: 19
-    });
-
-    const googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-    });
-
-    // Google Maps without POI (Points of Interest) - Cleaner Look
-    const googleClean = L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}&apistyle=s.t%3Apoi%7Cp.v%3Aoff%2Cs.t%3Atransit%7Cp.v%3Aoff', {
-        maxZoom: 20,
-        attribution: '&copy; Google Maps (Clean)'
-    });
-
-    const googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
 
     const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -82,7 +67,7 @@ function initMap() {
     map = L.map('map', {
         center: [PURBAYAN_CENTER.lat, PURBAYAN_CENTER.lng],
         zoom: DEFAULT_ZOOM,
-        layers: [googleStreets], // Default: Google
+        layers: [osmLayer], // Default: OSM
         zoomControl: false,
         attributionControl: true,
         tap: false // Fix for iOS click issues
@@ -90,9 +75,6 @@ function initMap() {
 
     // 3. Add Layer Control
     const baseMaps = {
-        "Google Maps (Default)": googleStreets,
-        "Google Bersih (No POI)": googleClean,
-        "Google Satelit": googleHybrid,
         "Peta Jalan (OSM)": osmLayer,
         "Satelit (Esri)": satelliteLayer,
         "Minimalis (Carto)": voyagerLayer
