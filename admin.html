@@ -51,9 +51,12 @@
             background: white;
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            overflow-x: auto;
-            /* Enable horizontal scrolling */
+            overflow: auto;
+            /* Enable scroll on both axes */
+            max-height: 75vh;
+            /* Set a specific height for vertical scroll */
+            position: relative;
+            /* Ensure sticky header context */
             -webkit-overflow-scrolling: touch;
         }
 
