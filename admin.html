@@ -52,11 +52,16 @@
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            overflow-x: auto;
+            /* Enable horizontal scrolling */
+            -webkit-overflow-scrolling: touch;
         }
 
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px;
+            /* Force scroll on small screens */
         }
 
         .data-table th,
