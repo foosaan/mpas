@@ -58,7 +58,7 @@ function initMap() {
 
     // OpenStreetMap tile layer with warm-toned style
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | SIG Kampung Wisata Purbayan',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | foosaan | SIG Kampung Wisata Purbayan',
         maxZoom: 19
     }).addTo(map);
 
