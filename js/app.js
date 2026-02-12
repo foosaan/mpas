@@ -56,6 +56,13 @@ function initMap() {
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
 
+    // Google Maps without POI (Points of Interest) - Cleaner Look
+    const googleClean = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&apistyle=s.t%3Apoi%7Cp.v%3Aoff%2Cs.t%3Atransit%7Cp.v%3Aoff', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '&copy; Google Maps (Clean)'
+    });
+
     const googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
@@ -84,9 +91,10 @@ function initMap() {
 
     // 3. Add Layer Control
     const baseMaps = {
-        "Google Maps": googleStreets,
+        "Google Maps (Default)": googleStreets,
+        "Google Bersih (No POI)": googleClean,
         "Google Satelit": googleHybrid,
-        "OpenStreetMap": osmLayer,
+        "Peta Jalan (OSM)": osmLayer,
         "Satelit (Esri)": satelliteLayer,
         "Minimalis (Carto)": voyagerLayer
     };
