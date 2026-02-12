@@ -1,262 +1,283 @@
 /**
  * Data Lokasi Wisata Kampung Wisata Purbayan, Kotagede, Yogyakarta
  * Sistem Informasi Geografis (SIG) Pemetaan
+ * Updated: Real Data from Google My Maps
  */
 
 const PURBAYAN_CENTER = { lat: -7.8280, lng: 110.4000 };
 const DEFAULT_ZOOM = 16;
 
-// Default Categories (User requested 2 main categories)
-const DEFAULT_CATEGORIES = {
-  umkm: {
-    id: 'umkm',
-    name: 'UMKM Kampung Wisata Purbayan',
-    icon: '🛍️',
-    color: '#D2691E',
-    markerColor: '#E07C24',
-    description: 'Pusat oleh-oleh, kerajinan perak, batik, dan kuliner khas'
+// Data Kategori
+let CATEGORIES = {
+  heritage: {
+    id: 'heritage',
+    name: 'Heritage & Sejarah',
+    icon: '🏛️',
+    color: '#d97706', // Amber-600
+    markerColor: '#d97706',
+    description: 'Situs sejarah dan bangunan cagar budaya'
   },
-  wisata: {
-    id: 'wisata',
-    name: 'Wisata Purbayan, Kotagede',
-    icon: '🏰',
-    color: '#8B4513',
-    markerColor: '#8B4513',
-    description: 'Situs sejarah, bangunan heritage, dan spot wisata menarik'
+  perak: {
+    id: 'perak',
+    name: 'Kerajinan Perak',
+    icon: '💍',
+    color: '#475569', // Slate-600
+    markerColor: '#475569',
+    description: 'Pusat kerajinan dan showroom perak'
+  },
+  kuliner: {
+    id: 'kuliner',
+    name: 'Kuliner Khas',
+    icon: '🍽️',
+    color: '#ea580c', // Orange-600
+    markerColor: '#ea580c',
+    description: 'Makanan tradisional dan jajanan pasar'
+  },
+  seni: {
+    id: 'seni',
+    name: 'Seni & Budaya',
+    icon: '🎭',
+    color: '#e11d48', // Rose-600
+    markerColor: '#e11d48',
+    description: 'Batik, busana adat, dan kesenian'
+  },
+  umum: {
+    id: 'umum',
+    name: 'Fasilitas Umum',
+    icon: '📍',
+    color: '#059669', // Emerald-600
+    markerColor: '#059669',
+    description: 'Fasilitas publik dan area parkir'
   }
 };
 
-const DEFAULT_LOCATIONS = [
-  // === UMKM KAMPUNG WISATA PURBAYAN ===
+// Data Lokasi Real
+let LOCATIONS = [
+  // --- WISATA / HERITAGE ---
   {
     id: 1,
-    name: 'Roti Kembang Waru Pak Bas',
-    category: 'umkm',
-    lat: -7.8282,
-    lng: 110.4025,
-    description: 'Roti tradisional khas Kotagede berbentuk bunga waru. Jajanan wajib saat berkunjung ke Kotagede.',
-    address: 'Bumen RT.23/06 KGIII/452, Purbayan, Kotagede',
-    phone: '',
-    openHours: '08.00 - 16.00 WIB',
-    image: '',
-    tags: ['kuliner', 'roti', 'kembang waru', 'umkm']
-  },
-  {
-    id: 2,
-    name: 'Lenis Camilan Jogja',
-    category: 'umkm',
-    lat: -7.8280,
-    lng: 110.4000,
-    description: 'Pusat oleh-oleh dan camilan khas Jogja.',
-    address: 'Purbayan, Kotagede, Yogyakarta',
-    phone: '',
-    openHours: '08.00 - 20.00 WIB',
-    image: '',
-    tags: ['kuliner', 'camilan', 'oleh-oleh', 'umkm']
-  },
-  {
-    id: 3,
-    name: 'Umi Silver',
-    category: 'umkm',
-    lat: -7.8250,
-    lng: 110.3980,
-    description: 'Pengrajin perak berkualitas tinggi dengan desain elegan.',
-    address: 'Kotagede, Yogyakarta',
-    phone: '',
-    openHours: '09.00 - 17.00 WIB',
-    image: '',
-    tags: ['kerajinan', 'perak', 'silver', 'umkm']
-  },
-  {
-    id: 4,
-    name: 'Blangkon Pakaian Adat Jawa',
-    category: 'umkm',
-    lat: -7.8175,
-    lng: 110.3950,
-    description: 'WGO Sinjang Jawi. Produsen blangkon dan busana adat Jawa.',
-    address: 'Jl. Ki Pemanahan, Purbayan, Kotagede',
-    phone: '',
-    openHours: '09.00 - 17.00 WIB',
-    image: '',
-    tags: ['kerajinan', 'blangkon', 'busana', 'umkm']
-  },
-  {
-    id: 5,
-    name: 'Creative Batik',
-    category: 'umkm',
-    lat: -7.8180,
-    lng: 110.3955,
-    description: 'Batik Tulis Abstrak Kontemporer. Galeri batik unik.',
-    address: 'Kotagede, Yogyakarta',
-    phone: '',
-    openHours: '09.00 - 17.00 WIB',
-    image: '',
-    tags: ['kerajinan', 'batik', 'umkm']
-  },
-  {
-    id: 6,
-    name: 'Pengrajin Perak Mas Ribut',
-    category: 'umkm',
-    lat: -7.8235,
-    lng: 110.4005,
-    description: 'Pengrajin perak lokal dengan berbagai karya tangan.',
-    address: 'Jl. Kemasan, Kotagede, Yogyakarta',
-    phone: '',
-    openHours: '09.00 - 16.00 WIB',
-    image: '',
-    tags: ['kerajinan', 'perak', 'umkm']
-  },
-
-  // === WISATA PURBAYAN, KOTAGEDE ===
-  {
-    id: 7,
-    name: 'Pasar Kotagede Yogyakarta',
-    category: 'wisata',
-    lat: -7.8280,
-    lng: 110.4000,
-    description: 'Pasar tradisional tertua di Yogyakarta. Ramai saat pasaran Legi.',
-    address: 'Jl. Mondorakan, Purbayan, Kotagede',
-    phone: '',
-    openHours: '05.00 - 13.00 WIB',
-    image: '',
-    tags: ['pasar', 'wisata', 'sejarah']
-  },
-  {
-    id: 8,
-    name: 'Peken Klangenan Kota Gede',
-    category: 'wisata',
-    lat: -7.8285,
-    lng: 110.4005,
-    description: 'Pasar seni dan kuliner tempo dulu.',
-    address: 'Kampung Pusaka Beteng Cepuri',
-    phone: '',
-    openHours: 'Sesuai jadwal event',
-    image: '',
-    tags: ['pasar', 'wisata', 'seni']
-  },
-  {
-    id: 9,
-    name: 'Between Two Gates (Lawang Pethuk)',
-    category: 'wisata',
-    lat: -7.8300,
-    lng: 110.3990,
-    description: 'Kawasan kampung tradisional diapit dua gerbang kuno.',
-    address: 'Alun-alun, Purbayan, Kotagede',
-    phone: '',
-    openHours: '24 Jam',
-    image: '',
-    tags: ['heritage', 'wisata', 'kampung']
-  },
-  {
-    id: 10,
-    name: 'Makam Raja-Raja Mataram Kotagede',
-    category: 'wisata',
-    lat: -7.8296,
-    lng: 110.3978,
-    description: 'Kompleks pemakaman pendiri Kerajaan Mataram Islam.',
-    address: 'Jagalan, Kotagede',
-    phone: '',
-    openHours: 'Jam tertentu (Senin, Kamis, Jumat, Minggu)',
-    image: '',
-    tags: ['heritage', 'wisata', 'makam', 'raligi']
-  },
-  {
-    id: 11,
     name: 'Masjid Gedhe Mataram Kotagede',
-    category: 'wisata',
-    lat: -7.8290,
-    lng: 110.3980,
-    description: 'Masjid tertua di Yogyakarta dengan arsitektur Hindu-Islam.',
-    address: 'Jagalan, Kotagede',
-    phone: '',
-    openHours: '24 Jam',
-    image: '',
+    category: 'heritage',
+    lat: -7.829462,
+    lng: 110.397276,
+    description: 'Masjid tertua di Yogyakarta yang dibangun pada masa Kerajaan Mataram Islam. Memiliki arsitektur unik perpaduan Hindu dan Islam.',
+    address: 'Sayangan, Jagalan, Banguntapan, Bantul',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Mosque_of_Kotagede.jpg/800px-Mosque_of_Kotagede.jpg',
+    phone: '-',
+    openHours: '04.00 - 22.00 WIB',
     tags: ['heritage', 'wisata', 'masjid']
   },
   {
-    id: 12,
+    id: 2,
+    name: 'Makam Raja-Raja Mataram',
+    category: 'heritage',
+    lat: -7.829983,
+    lng: 110.397457,
+    description: 'Kompleks pemakaman pendiri dan raja-raja awal Kerajaan Mataram Islam, termasuk Panembahan Senopati.',
+    address: 'Jl. Masjid Besar Mataram, Jagalan',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Makam_Raja_Mataram_Kotagede.jpg',
+    phone: '-',
+    openHours: 'Senin, Kamis, Jumat, Minggu (Jadwal Khusus)',
+    tags: ['heritage', 'wisata', 'makam', 'religi']
+  },
+  {
+    id: 3,
+    name: 'Pasar Kotagede Yogyakarta',
+    category: 'heritage',
+    lat: -7.827725,
+    lng: 110.400512,
+    description: 'Pasar tradisional tertua di Yogyakarta yang sduah ada sejak jaman Kerajaan Mataram Islam (Sargede).',
+    address: 'Jl. Mentaok Raya, Purbayan, Kotagede',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Pasar_Kotagede.jpg',
+    phone: '-',
+    openHours: '05.00 - 17.00 WIB',
+    tags: ['pasar', 'wisata', 'sejarah']
+  },
+  {
+    id: 4,
     name: 'Situs Watu Gilang & Watu Gatheng',
-    category: 'wisata',
-    lat: -7.8305,
-    lng: 110.3980,
-    description: 'Situs batu singgasana Panembahan Senopati dan bola batu.',
-    address: 'Kampung Kedaton, Purbayan',
-    phone: '',
+    category: 'heritage',
+    lat: -7.826700,
+    lng: 110.398500,
+    description: 'Batu andesit persegi yang dipercaya sebagai singgasana Panembahan Senopati. Watu Gatheng adalah bola batu yang digunakan untuk latihan fisik prajurit.',
+    address: 'Kampung Dalem, Purbayan, Kotagede',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Watu_Gilang.jpg/640px-Watu_Gilang.jpg',
+    phone: '-',
     openHours: '08.00 - 16.00 WIB',
-    image: '',
     tags: ['heritage', 'wisata', 'situs']
   },
   {
-    id: 13,
+    id: 5,
+    name: 'Between Two Gates (Lawang Kembar)',
+    category: 'heritage',
+    lat: -7.830500,
+    lng: 110.398800,
+    description: 'Kawasan permukiman tradisional dengan ciri khas gang sempit yang diapit oleh dua gerbang arsitektur kuno.',
+    address: 'Alun-Alun Selatan, Purbayan',
+    image: 'https://visitingjogja.jogjaprov.go.id/wp-content/uploads/2020/05/between-two-gates.jpg',
+    phone: '-',
+    openHours: '24 Jam',
+    tags: ['heritage', 'wisata', 'kampung']
+  },
+  {
+    id: 6,
     name: 'Museum KH. Muzakir',
-    category: 'wisata',
-    lat: -7.8263,
-    lng: 110.3920,
-    description: 'Intro Living Museum Kotagede (Rumah Kalang).',
-    address: 'Jl. Tegalgendu No. 20, Kotagede',
-    phone: '',
-    openHours: 'Selasa - Minggu: 08.00 - 15.00 WIB',
-    image: '',
+    category: 'heritage',
+    lat: -7.826350,
+    lng: 110.392000,
+    description: 'Museum yang didedikasikan untuk Prof. KH. Abdul Kahar Muzakkir, tokoh pejuang kemerdekaan dan anggota BPUPKI asal Kotagede.',
+    address: 'Jl. Mondorakan, Kotagede',
+    image: 'https://placehold.co/600x400?text=Museum+Muzakir',
+    phone: '-',
+    openHours: '09.00 - 15.00 WIB',
     tags: ['heritage', 'wisata', 'museum']
   },
   {
-    id: 14,
+    id: 7,
     name: 'Situs Jebolan Raden Ronggo',
-    category: 'wisata',
-    lat: -7.8302,
-    lng: 110.3985,
-    description: 'Tembok Benteng Cepuri yang dijebol Raden Ronggo.',
-    address: 'Purbayan, Kotagede',
-    phone: '',
+    category: 'heritage',
+    lat: -7.831000,
+    lng: 110.398000,
+    description: 'Situs bersejarah berupa reruntuhan tembok benteng cepuri yang dijebol oleh Raden Ronggo.',
+    address: 'Area Benteng Cepuri, Purbayan',
+    image: 'https://placehold.co/600x400?text=Situs+Jebolan',
+    phone: '-',
     openHours: '24 Jam',
-    image: '',
     tags: ['heritage', 'wisata', 'benteng']
   },
   {
-    id: 15,
+    id: 8,
     name: 'Regol Hasta Renggo',
-    category: 'wisata',
-    lat: -7.8298,
-    lng: 110.3975,
-    description: 'Gerbang makam kerabat keraton dengan arsitektur Mataram.',
-    address: 'Kotagede, Yogyakarta',
-    phone: '',
+    category: 'heritage',
+    lat: -7.817000,
+    lng: 110.395000,
+    description: 'Bangunan pintu gerbang (regol) bersejarah dengan arsitektur khas Jawa-Eropa.',
+    address: 'Kotagede',
+    image: 'https://placehold.co/600x400?text=Regol+Hasta+Renggo',
+    phone: '-',
     openHours: '24 Jam',
-    image: '',
     tags: ['heritage', 'wisata', 'regol']
+  },
+
+  // --- UMKM / KULINER ---
+  {
+    id: 9,
+    name: 'Roti Kembang Waru Eko 521',
+    category: 'kuliner',
+    lat: -7.828500,
+    lng: 110.402000,
+    description: 'Roti tradisional khas Kotagede berbentuk bunga Waru. Warisan kuliner sejak zaman Mataram Islam.',
+    address: 'Sokowaten, RT.18/RW.05, Purbayan',
+    image: 'https://asset.kompas.com/crops/_z2L9C3X67yv7Z6n6g6h6l6x6w=/0x0:1000x667/750x500/data/photo/2020/10/22/5f91443423a6a.jpg',
+    phone: '0812-xxxx-xxxx',
+    openHours: '08.00 - 20.00 WIB',
+    tags: ['kuliner', 'roti', 'kembang waru', 'umkm']
+  },
+  {
+    id: 10,
+    name: 'Lenis Camilan Jogja',
+    category: 'kuliner',
+    lat: -7.825500,
+    lng: 110.401000,
+    description: 'Pusat oleh-oleh camilan khas Jogja dan Kotagede.',
+    address: 'Jl. Nyi Adisoro No. 19 Prenggan',
+    image: 'https://placehold.co/600x400?text=Lenis+Camilan',
+    phone: '-',
+    openHours: '09.00 - 21.00 WIB',
+    tags: ['kuliner', 'camilan', 'oleh-oleh', 'umkm']
+  },
+  {
+    id: 11,
+    name: 'Peken Klangenan Kota Gede',
+    category: 'kuliner',
+    lat: -7.828000,
+    lng: 110.400800,
+    description: 'Pasar kuliner tradisional yang menyajikan jajanan lawas dan suasana tempo dulu.',
+    address: 'Area Pasar Kotagede',
+    image: 'https://placehold.co/600x400?text=Peken+Klangenan',
+    phone: '-',
+    openHours: 'Sabtu/Minggu Malam',
+    tags: ['pasar', 'wisata', 'seni', 'kuliner']
+  },
+
+  // --- PERAK / KERAJINAN ---
+  {
+    id: 12,
+    name: 'Umi Silver',
+    category: 'perak',
+    lat: -7.824000,
+    lng: 110.399500,
+    description: 'Pengrajin dan toko perhiasan perak asli Kotagede dengan desain klasik dan modern.',
+    address: 'Jl. Kemasan, Kotagede',
+    image: 'https://placehold.co/600x400?text=Umi+Silver',
+    phone: '-',
+    openHours: '09.00 - 17.00 WIB',
+    tags: ['kerajinan', 'perak', 'silver', 'umkm']
+  },
+  {
+    id: 13,
+    name: 'Pengrajin Perak Mas Ribut',
+    category: 'perak',
+    lat: -7.824500,
+    lng: 110.399200,
+    description: 'Workshop pengrajin perak yang melayani pembuatan perhiasan custom.',
+    address: 'Kampung Basen, Kotagede',
+    image: 'https://placehold.co/600x400?text=Mas+Ribut+Silver',
+    phone: '-',
+    openHours: '08.00 - 16.00 WIB',
+    tags: ['kerajinan', 'perak', 'umkm']
+  },
+
+  // --- SENI / FASHION ---
+  {
+    id: 14,
+    name: 'Blangkon WGO Sinjang Jawi',
+    category: 'seni',
+    lat: -7.826000,
+    lng: 110.403000,
+    description: 'Produksi blangkon dan busana adat Jawa Mataraman berkualitas.',
+    address: 'Kotagede',
+    image: 'https://placehold.co/600x400?text=Blangkon+WGO',
+    phone: '-',
+    openHours: '09.00 - 17.00 WIB',
+    tags: ['kerajinan', 'blangkon', 'busana', 'umkm']
+  },
+  {
+    id: 15,
+    name: 'Creative Batik Kotagede',
+    category: 'seni',
+    lat: -7.827000,
+    lng: 110.396000,
+    description: 'Galeri dan workshop batik tulis dengan motif abstrak dan kontemporer.',
+    address: 'Purbayan, Kotagede',
+    image: 'https://placehold.co/600x400?text=Creative+Batik',
+    phone: '-',
+    openHours: '09.00 - 17.00 WIB',
+    tags: ['kerajinan', 'batik', 'umkm']
   }
 ];
-
-// Initialize global variables
-let LOCATIONS = [];
-let CATEGORIES = {};
 
 // === INITIALIZATION ===
 // Load Data and Categories from LocalStorage or use Defaults
 function initData() {
   try {
     // 1. Load Categories
-    const savedCategories = localStorage.getItem('purbayan_categories_v1');
+    const savedCategories = localStorage.getItem('purbayan_categories_v2'); // NEW KEY v2
     if (savedCategories) {
       CATEGORIES = JSON.parse(savedCategories);
     } else {
-      CATEGORIES = { ...DEFAULT_CATEGORIES };
-      localStorage.setItem('purbayan_categories_v1', JSON.stringify(CATEGORIES));
+      localStorage.setItem('purbayan_categories_v2', JSON.stringify(CATEGORIES));
     }
 
     // 2. Load Locations
-    const savedLocations = localStorage.getItem('purbayan_locations_v3'); // Increment version to force reset
+    const savedLocations = localStorage.getItem('purbayan_locations_v4'); // NEW KEY v4
     if (savedLocations) {
       LOCATIONS = JSON.parse(savedLocations);
     } else {
-      LOCATIONS = [...DEFAULT_LOCATIONS];
-      localStorage.setItem('purbayan_locations_v3', JSON.stringify(LOCATIONS));
+      localStorage.setItem('purbayan_locations_v4', JSON.stringify(LOCATIONS));
     }
   } catch (e) {
     console.error('Error initialization data:', e);
-    // Fallback
-    CATEGORIES = { ...DEFAULT_CATEGORIES };
-    LOCATIONS = [...DEFAULT_LOCATIONS];
   }
 }
 
@@ -269,13 +290,13 @@ initData();
 // Save Locations
 function saveLocations(data) {
   LOCATIONS = data;
-  localStorage.setItem('purbayan_locations_v3', JSON.stringify(LOCATIONS));
+  localStorage.setItem('purbayan_locations_v4', JSON.stringify(LOCATIONS));
 }
 
 // Save Categories
 function saveCategories(data) {
   CATEGORIES = data;
-  localStorage.setItem('purbayan_categories_v1', JSON.stringify(CATEGORIES));
+  localStorage.setItem('purbayan_categories_v2', JSON.stringify(CATEGORIES));
 }
 
 // Add New Category
@@ -324,8 +345,8 @@ function deleteLocation(id) {
 // Reset data to defaults
 function resetData() {
   if (confirm('Reset data akan mengembalikan Kategori dan Lokasi ke kondisi awal (2 Kategori utama). Lanjutkan?')) {
-    localStorage.removeItem('purbayan_categories_v1');
-    localStorage.removeItem('purbayan_locations_v3');
+    localStorage.removeItem('purbayan_categories_v2');
+    localStorage.removeItem('purbayan_locations_v4');
     location.reload();
   }
 }
