@@ -200,13 +200,38 @@ function populateCategories() {
 function initMap() {
     if (map) return;
 
-    // Initialize map centered on Purbayan
-    map = L.map('mapPicker').setView([PURBAYAN_CENTER.lat, PURBAYAN_CENTER.lng], 16);
+    // 1. Define Base Layers
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | foosaan',
+        maxZoom: 19
+    });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: 19
+    });
+
+    const voyagerLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+    });
+
+    // 2. Initialize map centered on Purbayan
+    map = L.map('mapPicker', {
+        center: [PURBAYAN_CENTER.lat, PURBAYAN_CENTER.lng],
+        zoom: 16,
+        layers: [osmLayer] // Default
+    });
+
+    // 3. Add Layer Control
+    const baseMaps = {
+        "Peta Jalan": osmLayer,
+        "Satelit (Esri)": satelliteLayer,
+        "Minimalis (Carto)": voyagerLayer
+    };
+
+    L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
     // Click on map to set coordinates
     map.on('click', function (e) {

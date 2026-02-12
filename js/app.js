@@ -45,22 +45,44 @@ function createMarkerIcon(color, icon, isActive = false) {
 // Initialize the map
 function initMap() {
     // Create Leaflet map
+    // 1. Define Base Layers
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | foosaan | SIG Purbayan',
+        maxZoom: 19
+    });
+
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: 19
+    });
+
+    const voyagerLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+    });
+
+    // 2. Initialize Map with Default Layer
     map = L.map('map', {
         center: [PURBAYAN_CENTER.lat, PURBAYAN_CENTER.lng],
         zoom: DEFAULT_ZOOM,
+        layers: [osmLayer], // Default: OSM
         zoomControl: false,
         attributionControl: true,
         tap: false // Fix for iOS click issues
     });
 
+    // 3. Add Layer Control
+    const baseMaps = {
+        "Peta Jalan": osmLayer,
+        "Satelit (Esri)": satelliteLayer,
+        "Minimalis (Carto)": voyagerLayer
+    };
+
+    L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
+
     // Add zoom control to the right
     L.control.zoom({ position: 'topright' }).addTo(map);
-
-    // OpenStreetMap tile layer with warm-toned style
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | foosaan | SIG Kampung Wisata Purbayan',
-        maxZoom: 19
-    }).addTo(map);
 
     // Create markers layer group
     markersLayer = L.layerGroup().addTo(map);
