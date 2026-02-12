@@ -78,6 +78,9 @@
             color: var(--text-medium);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .data-table tr:last-child td {
@@ -234,6 +237,21 @@
             </div>
         </div>
 
+        <!-- Search and Filter Section -->
+        <div
+            style="background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; gap: 15px; flex-wrap: wrap;">
+            <div style="flex: 2; min-width: 200px;">
+                <input type="text" id="searchInput" placeholder="Cari nama lokasi..." class="form-control"
+                    style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23999\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><circle cx=\'11\' cy=\'11\' r=\'8\'></circle><line x1=\'21\' y1=\'21\' x2=\'16.65\' y2=\'16.65\'></line></svg>'); background-repeat: no-repeat; background-position: 10px center; padding-left: 35px;">
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <select id="filterCategory" class="form-control">
+                    <option value="all">Semua Kategori</option>
+                    <!-- Categories populated JS -->
+                </select>
+            </div>
+        </div>
+
         <div class="admin-content">
             <table class="data-table">
                 <thead>
@@ -339,6 +357,11 @@
     <!-- Valid Data & Admin Logic -->
     <script src="js/data.js"></script>
     <script src="js/admin.js"></script>
+    <!-- Toast Notification Container -->
+    <div id="toastContainer"
+        style="position: fixed; top: 20px; right: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px;">
+    </div>
+
 </body>
 
 </html>

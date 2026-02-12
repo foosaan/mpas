@@ -1,6 +1,6 @@
 /**
  * Admin Logic for SIG Kampung Wisata Purbayan
- * Handles CRUD operations and Map Picker
+ * Handles CRUD operations, Map Picker, Search, Filter, and Notifications
  */
 
 let map;
@@ -26,8 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Initial Render
     renderTable();
     populateCategories();
+
+    // Event Listeners for Search & Filter
+    document.getElementById('searchInput').addEventListener('input', filterData);
+    document.getElementById('filterCategory').addEventListener('change', filterData);
 
     // Handle form submit
     document.getElementById('locationForm').addEventListener('submit', handleFormSubmit);
@@ -46,6 +51,7 @@ function checkPin() {
     if (input === ADMIN_PIN) {
         sessionStorage.setItem('purbayan_admin_auth', 'true');
         showAdminContent();
+        showToast('Info: Login Berhasil', 'success');
     } else {
         document.getElementById('errorMsg').style.display = 'block';
         document.getElementById('pinInput').value = '';
@@ -55,6 +61,64 @@ function checkPin() {
 function showAdminContent() {
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('adminContent').style.display = 'block';
+}
+
+// === TOAST NOTIFICATION SYSTEM ===
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+
+    // Toast Styling
+    toast.style.background = type === 'success' ? '#059669' : '#dc2626';
+    toast.style.color = 'white';
+    toast.style.padding = '12px 20px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    toast.style.display = 'flex';
+    toast.style.alignItems = 'center';
+    toast.style.gap = '10px';
+    toast.style.minWidth = '250px';
+    toast.style.fontSize = '0.9rem';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-20px)';
+    toast.style.transition = 'all 0.3s ease';
+
+    // Icon based on type
+    const icon = type === 'success' ? '✅' : '⚠️';
+    toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+
+    container.appendChild(toast);
+
+    // Animate In
+    setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    }, 10);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px)';
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+
+// === FILTER & SEARCH LOGIC ===
+function filterData() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const categoryFilter = document.getElementById('filterCategory').value;
+
+    const filtered = LOCATIONS.filter(loc => {
+        const matchesSearch = loc.name.toLowerCase().includes(searchTerm) ||
+            (loc.description && loc.description.toLowerCase().includes(searchTerm));
+        const matchesCategory = categoryFilter === 'all' || loc.category === categoryFilter;
+
+        return matchesSearch && matchesCategory;
+    });
+
+    renderTable(filtered);
 }
 
 // Toggle New Category Inputs
@@ -72,12 +136,17 @@ function toggleNewCategory() {
     }
 }
 
-function renderTable() {
+function renderTable(data = LOCATIONS) {
     const tbody = document.getElementById('locationTableBody');
     tbody.innerHTML = '';
 
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #888;">Tidak ada data yang cocok.</td></tr>';
+        return;
+    }
+
     // Sort locations by ID descending (newest first)
-    const sortedLocations = [...LOCATIONS].sort((a, b) => b.id - a.id);
+    const sortedLocations = [...data].sort((a, b) => b.id - a.id);
 
     sortedLocations.forEach(loc => {
         // Fallback if category was deleted or missing
@@ -86,7 +155,7 @@ function renderTable() {
         const row = document.createElement('tr');
         row.innerHTML = `
       <td><strong>${loc.name}</strong></td>
-      <td><span class="category-badge" style="background:${catData.color}; color:white; padding: 2px 8px; border-radius: 4px; font-size: 0.8em;">${catData.name}</span></td>
+      <td><span class="category-badge" style="background:${catData.color}; color:white; padding: 4px 10px; border-radius: 20px; font-size: 0.75em; font-weight: 500;">${catData.name}</span></td>
       <td>${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}</td>
       <td>
         <button class="action-btn btn-edit" onclick="editLocation(${loc.id})">Edit</button>
@@ -99,16 +168,27 @@ function renderTable() {
 
 function populateCategories() {
     const select = document.getElementById('category');
+    const filterSelect = document.getElementById('filterCategory');
+
+    // Clear existing (except first option for filter)
     select.innerHTML = '';
+    filterSelect.innerHTML = '<option value="all">Semua Kategori</option>';
 
     for (const key in CATEGORIES) {
+        // Populate Form Select
         const option = document.createElement('option');
         option.value = key;
         option.textContent = CATEGORIES[key].name;
         select.appendChild(option);
+
+        // Populate Filter Select
+        const filterOption = document.createElement('option');
+        filterOption.value = key;
+        filterOption.textContent = CATEGORIES[key].name;
+        filterSelect.appendChild(filterOption);
     }
 
-    // Add "New Category" option
+    // Add "New Category" option to Form Select
     const newOption = document.createElement('option');
     newOption.value = 'new';
     newOption.textContent = '+ Buat Kategori Baru...';
@@ -215,7 +295,8 @@ function editLocation(id) {
 function removeLocation(id) {
     if (confirm('Apakah Anda yakin ingin menghapus lokasi ini?')) {
         deleteLocation(id);
-        renderTable();
+        filterData(); // Re-render with current filters
+        showToast('Lokasi berhasil dihapus', 'success');
     }
 }
 
@@ -231,7 +312,7 @@ function handleFormSubmit(e) {
         const icon = document.getElementById('newCatIcon').value.trim() || '📍';
 
         if (!name) {
-            alert('Nama Kategori tidak boleh kosong!');
+            showToast('Nama Kategori tidak boleh kosong!', 'error');
             return;
         }
 
@@ -239,7 +320,7 @@ function handleFormSubmit(e) {
         const id = name.toLowerCase().replace(/[^a-z0-9]/g, '');
 
         if (CATEGORIES[id]) {
-            alert('ID Kategori sudah ada!');
+            showToast('ID Kategori sudah ada!', 'error');
             return;
         }
 
@@ -247,7 +328,7 @@ function handleFormSubmit(e) {
         addCategory(id, name, color, icon);
         categoryId = id;
 
-        // Refresh dropdown
+        // Refresh dropdowns
         populateCategories();
     }
 
@@ -271,6 +352,6 @@ function handleFormSubmit(e) {
     }
 
     closeModal();
-    renderTable();
-    alert('Data berhasil disimpan!');
+    filterData(); // Re-render with current filters
+    showToast('Data berhasil disimpan!', 'success');
 }
