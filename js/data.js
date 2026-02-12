@@ -1,7 +1,7 @@
 /**
  * Data Lokasi Wisata Kampung Wisata Purbayan, Kotagede, Yogyakarta
  * Sistem Informasi Geografis (SIG) Pemetaan
- * Updated: Real Data from Google My Maps
+ * Updated: Real Data from Google My Maps + User Corrections
  */
 
 const PURBAYAN_CENTER = { lat: -7.8280, lng: 110.4000 };
@@ -177,8 +177,8 @@ let LOCATIONS = [
     id: 10,
     name: 'Lenis Camilan Jogja',
     category: 'kuliner',
-    lat: -7.825500,
-    lng: 110.401000,
+    lat: -7.830200, // Adjusted based on Ndalem Cepuri context
+    lng: 110.398000,
     description: 'Pusat oleh-oleh camilan khas Jogja dan Kotagede.',
     address: 'Jl. Nyi Adisoro No. 19 Prenggan',
     image: 'https://placehold.co/600x400?text=Lenis+Camilan',
@@ -218,8 +218,8 @@ let LOCATIONS = [
     id: 13,
     name: 'Pengrajin Perak Mas Ribut',
     category: 'perak',
-    lat: -7.824500,
-    lng: 110.399200,
+    lat: -7.822500, // Adjusted to Kampung Basen / North of Market
+    lng: 110.400500,
     description: 'Workshop pengrajin perak yang melayani pembuatan perhiasan custom.',
     address: 'Kampung Basen, Kotagede',
     image: 'https://placehold.co/600x400?text=Mas+Ribut+Silver',
@@ -233,8 +233,8 @@ let LOCATIONS = [
     id: 14,
     name: 'Blangkon WGO Sinjang Jawi',
     category: 'seni',
-    lat: -7.826000,
-    lng: 110.403000,
+    lat: -7.831500, // Adjusted near Jl. Ki Pemanahan / Purbayan South
+    lng: 110.401000,
     description: 'Produksi blangkon dan busana adat Jawa Mataraman berkualitas.',
     address: 'Kotagede',
     image: 'https://placehold.co/600x400?text=Blangkon+WGO',
@@ -246,8 +246,8 @@ let LOCATIONS = [
     id: 15,
     name: 'Creative Batik Kotagede',
     category: 'seni',
-    lat: -7.827000,
-    lng: 110.396000,
+    lat: -7.827500, // Adjusted to kampung area north of market
+    lng: 110.401500,
     description: 'Galeri dan workshop batik tulis dengan motif abstrak dan kontemporer.',
     address: 'Purbayan, Kotagede',
     image: 'https://placehold.co/600x400?text=Creative+Batik',
@@ -270,11 +270,11 @@ function initData() {
     }
 
     // 2. Load Locations
-    const savedLocations = localStorage.getItem('purbayan_locations_v4'); // NEW KEY v4
+    const savedLocations = localStorage.getItem('purbayan_locations_v5'); // NEW KEY v5 (Force Update)
     if (savedLocations) {
       LOCATIONS = JSON.parse(savedLocations);
     } else {
-      localStorage.setItem('purbayan_locations_v4', JSON.stringify(LOCATIONS));
+      localStorage.setItem('purbayan_locations_v5', JSON.stringify(LOCATIONS));
     }
   } catch (e) {
     console.error('Error initialization data:', e);
@@ -290,7 +290,7 @@ initData();
 // Save Locations
 function saveLocations(data) {
   LOCATIONS = data;
-  localStorage.setItem('purbayan_locations_v4', JSON.stringify(LOCATIONS));
+  localStorage.setItem('purbayan_locations_v5', JSON.stringify(LOCATIONS));
 }
 
 // Save Categories
@@ -346,7 +346,7 @@ function deleteLocation(id) {
 function resetData() {
   if (confirm('Reset data akan mengembalikan Kategori dan Lokasi ke kondisi awal (2 Kategori utama). Lanjutkan?')) {
     localStorage.removeItem('purbayan_categories_v2');
-    localStorage.removeItem('purbayan_locations_v4');
+    localStorage.removeItem('purbayan_locations_v5');
     location.reload();
   }
 }
