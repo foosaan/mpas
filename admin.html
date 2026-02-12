@@ -21,12 +21,15 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* Admin Specific Styles */
+        /* Admin Specific Styles */
+        html,
         body {
             background-color: #f4f4f5;
-            overflow: auto;
-            /* Override global style */
-            height: auto;
-            /* Override global style */
+            overflow: auto !important;
+            /* Force scroll */
+            height: auto !important;
+            /* Force height */
+            min-height: 100vh;
         }
 
         .admin-container {
