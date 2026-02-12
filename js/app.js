@@ -156,18 +156,20 @@ function addMarkers() {
             touchStartPos = null;
         });
 
-        // Marker hover
-        marker.on('mouseover', () => {
-            if (marker !== activeMarker) {
-                marker.setIcon(createMarkerIcon(category.markerColor, category.icon, true));
-            }
-        });
+        // Marker hover (Desktop only)
+        if (!L.Browser.mobile) {
+            marker.on('mouseover', () => {
+                if (marker !== activeMarker) {
+                    marker.setIcon(createMarkerIcon(category.markerColor, category.icon, true));
+                }
+            });
 
-        marker.on('mouseout', () => {
-            if (marker !== activeMarker) {
-                marker.setIcon(createMarkerIcon(category.markerColor, category.icon, false));
-            }
-        });
+            marker.on('mouseout', () => {
+                if (marker !== activeMarker) {
+                    marker.setIcon(createMarkerIcon(category.markerColor, category.icon, false));
+                }
+            });
+        }
 
         // Staggered animation
         setTimeout(() => {
