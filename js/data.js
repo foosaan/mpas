@@ -41,7 +41,8 @@ let LOCATIONS = [
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Mosque_of_Kotagede.jpg/800px-Mosque_of_Kotagede.jpg',
     phone: '-',
     openHours: '04.00 - 22.00 WIB',
-    tags: ['heritage', 'wisata', 'masjid']
+    tags: ['heritage', 'wisata', 'masjid'],
+    order: 0
   },
   {
     id: 2,
@@ -54,7 +55,8 @@ let LOCATIONS = [
     image: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Makam_Raja_Mataram_Kotagede.jpg',
     phone: '-',
     openHours: 'Senin, Kamis, Jumat, Minggu (Jadwal Khusus)',
-    tags: ['heritage', 'wisata', 'makam', 'religi']
+    tags: ['heritage', 'wisata', 'makam', 'religi'],
+    order: 1
   },
   {
     id: 3,
@@ -67,7 +69,8 @@ let LOCATIONS = [
     image: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Pasar_Kotagede.jpg',
     phone: '-',
     openHours: '05.00 - 17.00 WIB',
-    tags: ['pasar', 'wisata', 'sejarah']
+    tags: ['pasar', 'wisata', 'sejarah'],
+    order: 2
   },
   {
     id: 4,
@@ -80,7 +83,8 @@ let LOCATIONS = [
     image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Watu_Gilang.jpg/640px-Watu_Gilang.jpg',
     phone: '-',
     openHours: '08.00 - 16.00 WIB',
-    tags: ['heritage', 'wisata', 'situs']
+    tags: ['heritage', 'wisata', 'situs'],
+    order: 3
   },
   {
     id: 5,
@@ -93,7 +97,8 @@ let LOCATIONS = [
     image: 'https://visitingjogja.jogjaprov.go.id/wp-content/uploads/2020/05/between-two-gates.jpg',
     phone: '-',
     openHours: '24 Jam',
-    tags: ['heritage', 'wisata', 'kampung']
+    tags: ['heritage', 'wisata', 'kampung'],
+    order: 4
   },
   {
     id: 6,
@@ -106,7 +111,8 @@ let LOCATIONS = [
     image: 'https://placehold.co/600x400?text=Museum+Muzakir',
     phone: '-',
     openHours: '09.00 - 15.00 WIB',
-    tags: ['heritage', 'wisata', 'museum']
+    tags: ['heritage', 'wisata', 'museum'],
+    order: 5
   },
   {
     id: 7,
@@ -119,7 +125,8 @@ let LOCATIONS = [
     image: 'https://placehold.co/600x400?text=Situs+Jebolan',
     phone: '-',
     openHours: '24 Jam',
-    tags: ['heritage', 'wisata', 'benteng']
+    tags: ['heritage', 'wisata', 'benteng'],
+    order: 6
   },
   {
     id: 8,
@@ -132,7 +139,8 @@ let LOCATIONS = [
     image: 'https://placehold.co/600x400?text=Regol+Hasta+Renggo',
     phone: '-',
     openHours: '24 Jam',
-    tags: ['heritage', 'wisata', 'regol']
+    tags: ['heritage', 'wisata', 'regol'],
+    order: 7
   },
   {
     id: 11,
@@ -145,7 +153,8 @@ let LOCATIONS = [
     image: 'https://placehold.co/600x400?text=Peken+Klangenan',
     phone: '-',
     openHours: 'Sabtu/Minggu Malam',
-    tags: ['pasar', 'wisata', 'seni', 'kuliner']
+    tags: ['pasar', 'wisata', 'seni', 'kuliner'],
+    order: 8
   },
 
   // --- UMKM KAMPUNG WISATA ---
@@ -160,7 +169,8 @@ let LOCATIONS = [
     image: 'https://asset.kompas.com/crops/_z2L9C3X67yv7Z6n6g6h6l6x6w=/0x0:1000x667/750x500/data/photo/2020/10/22/5f91443423a6a.jpg',
     phone: '0812-xxxx-xxxx',
     openHours: '08.00 - 20.00 WIB',
-    tags: ['kuliner', 'roti', 'kembang waru', 'umkm']
+    tags: ['kuliner', 'roti', 'kembang waru', 'umkm'],
+    order: 9
   },
   {
     id: 10,
@@ -173,7 +183,8 @@ let LOCATIONS = [
     image: 'https://placehold.co/600x400?text=Lenis+Camilan',
     phone: '-',
     openHours: '09.00 - 21.00 WIB',
-    tags: ['kuliner', 'camilan', 'oleh-oleh', 'umkm']
+    tags: ['kuliner', 'camilan', 'oleh-oleh', 'umkm'],
+    order: 10
   },
   {
     id: 12,
@@ -186,7 +197,8 @@ let LOCATIONS = [
     image: 'https://placehold.co/600x400?text=Umi+Silver',
     phone: '-',
     openHours: '09.00 - 17.00 WIB',
-    tags: ['kerajinan', 'perak', 'silver', 'umkm']
+    tags: ['kerajinan', 'perak', 'silver', 'umkm'],
+    order: 11
   },
   {
     id: 13,
@@ -199,7 +211,8 @@ let LOCATIONS = [
     image: 'https://placehold.co/600x400?text=Mas+Ribut+Silver',
     phone: '-',
     openHours: '08.00 - 16.00 WIB',
-    tags: ['kerajinan', 'perak', 'umkm']
+    tags: ['kerajinan', 'perak', 'umkm'],
+    order: 12
   },
   {
     id: 14,
@@ -212,7 +225,8 @@ let LOCATIONS = [
     image: 'https://placehold.co/600x400?text=Blangkon+WGO',
     phone: '-',
     openHours: '09.00 - 17.00 WIB',
-    tags: ['kerajinan', 'blangkon', 'busana', 'umkm']
+    tags: ['kerajinan', 'blangkon', 'busana', 'umkm'],
+    order: 13
   },
   {
     id: 15,
@@ -225,7 +239,8 @@ let LOCATIONS = [
     image: 'https://placehold.co/600x400?text=Creative+Batik',
     phone: '-',
     openHours: '09.00 - 17.00 WIB',
-    tags: ['kerajinan', 'batik', 'umkm']
+    tags: ['kerajinan', 'batik', 'umkm'],
+    order: 14
   }
 ];
 
@@ -242,11 +257,22 @@ function initData() {
     }
 
     // 2. Load Locations
-    const savedLocations = localStorage.getItem('purbayan_locations_v6'); // NEW KEY v6 (Force Update)
+    const savedLocations = localStorage.getItem('purbayan_locations_v7'); // NEW KEY v7 (Order support)
     if (savedLocations) {
       LOCATIONS = JSON.parse(savedLocations);
+      // Auto-assign order for locations that don't have it
+      let needsSave = false;
+      LOCATIONS.forEach((loc, i) => {
+        if (loc.order === undefined || loc.order === null) {
+          loc.order = i;
+          needsSave = true;
+        }
+      });
+      if (needsSave) {
+        localStorage.setItem('purbayan_locations_v7', JSON.stringify(LOCATIONS));
+      }
     } else {
-      localStorage.setItem('purbayan_locations_v6', JSON.stringify(LOCATIONS));
+      localStorage.setItem('purbayan_locations_v7', JSON.stringify(LOCATIONS));
     }
   } catch (e) {
     console.error('Error initialization data:', e);
@@ -262,7 +288,7 @@ initData();
 // Save Locations
 function saveLocations(data) {
   LOCATIONS = data;
-  localStorage.setItem('purbayan_locations_v6', JSON.stringify(LOCATIONS));
+  localStorage.setItem('purbayan_locations_v7', JSON.stringify(LOCATIONS));
 }
 
 // Save Categories
@@ -292,6 +318,11 @@ function addLocation(newLocation) {
   if (!newLocation.id) {
     newLocation.id = Date.now();
   }
+  // Assign order to the end if not set
+  if (newLocation.order === undefined || newLocation.order === null) {
+    const maxOrder = LOCATIONS.reduce((max, l) => Math.max(max, l.order || 0), -1);
+    newLocation.order = maxOrder + 1;
+  }
   LOCATIONS.push(newLocation);
   saveLocations(LOCATIONS);
   return newLocation;
@@ -301,6 +332,10 @@ function addLocation(newLocation) {
 function updateLocation(updatedLocation) {
   const index = LOCATIONS.findIndex(l => l.id == updatedLocation.id);
   if (index !== -1) {
+    // Preserve order if not explicitly set in the update
+    if (updatedLocation.order === undefined || updatedLocation.order === null) {
+      updatedLocation.order = LOCATIONS[index].order;
+    }
     LOCATIONS[index] = updatedLocation;
     saveLocations(LOCATIONS);
     return true;
@@ -311,6 +346,54 @@ function updateLocation(updatedLocation) {
 // Delete location
 function deleteLocation(id) {
   LOCATIONS = LOCATIONS.filter(l => l.id != id);
+  normalizeOrder();
+  saveLocations(LOCATIONS);
+}
+
+// === ORDER MANAGEMENT FUNCTIONS ===
+
+// Normalize order values (0, 1, 2, ...)
+function normalizeOrder() {
+  LOCATIONS.sort((a, b) => (a.order || 0) - (b.order || 0));
+  LOCATIONS.forEach((loc, i) => {
+    loc.order = i;
+  });
+}
+
+// Move location to the very top (order = 0)
+function moveLocationToTop(id) {
+  const loc = LOCATIONS.find(l => l.id == id);
+  if (!loc) return;
+  loc.order = -1; // Temporarily set to -1
+  normalizeOrder();
+  saveLocations(LOCATIONS);
+}
+
+// Move location up by one position
+function moveLocationUp(id) {
+  const sorted = [...LOCATIONS].sort((a, b) => (a.order || 0) - (b.order || 0));
+  const idx = sorted.findIndex(l => l.id == id);
+  if (idx <= 0) return; // Already at top
+
+  // Swap orders
+  const temp = sorted[idx].order;
+  sorted[idx].order = sorted[idx - 1].order;
+  sorted[idx - 1].order = temp;
+
+  saveLocations(LOCATIONS);
+}
+
+// Move location down by one position
+function moveLocationDown(id) {
+  const sorted = [...LOCATIONS].sort((a, b) => (a.order || 0) - (b.order || 0));
+  const idx = sorted.findIndex(l => l.id == id);
+  if (idx === -1 || idx >= sorted.length - 1) return; // Already at bottom
+
+  // Swap orders
+  const temp = sorted[idx].order;
+  sorted[idx].order = sorted[idx + 1].order;
+  sorted[idx + 1].order = temp;
+
   saveLocations(LOCATIONS);
 }
 
@@ -318,7 +401,7 @@ function deleteLocation(id) {
 function resetData() {
   if (confirm('Reset data akan mengembalikan Kategori dan Lokasi ke kondisi awal (2 Kategori utama). Lanjutkan?')) {
     localStorage.removeItem('purbayan_categories_v3');
-    localStorage.removeItem('purbayan_locations_v6');
+    localStorage.removeItem('purbayan_locations_v7');
     location.reload();
   }
 }

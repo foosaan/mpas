@@ -209,6 +209,57 @@
             color: var(--text-light);
             margin-top: 4px;
         }
+
+        /* Drag Handle & Order */
+        .drag-handle {
+            cursor: grab;
+            font-size: 1.2rem;
+            color: #94a3b8;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .drag-handle:hover {
+            color: #475569;
+            background: #f1f5f9;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .order-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            color: #4338ca;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        /* Drag state */
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #dbeafe !important;
+        }
+
+        .sortable-chosen {
+            background: #eff6ff !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .data-table tr {
+            transition: background 0.15s;
+        }
     </style>
 </head>
 
@@ -265,6 +316,7 @@
             <table class="data-table">
                 <thead>
                     <tr>
+                        <th>Urutan</th>
                         <th>Nama Lokasi</th>
                         <th>Kategori</th>
                         <th>Koordinat</th>
@@ -363,9 +415,12 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
+    <!-- SortableJS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+
     <!-- Valid Data & Admin Logic -->
     <script src="js/data.js"></script>
-    <script src="js/admin.js?v=3"></script>
+    <script src="js/admin.js?v=4"></script>
     <!-- Toast Notification Container -->
     <div id="toastContainer"
         style="position: fixed; top: 20px; right: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px;">

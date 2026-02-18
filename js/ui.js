@@ -153,6 +153,9 @@ function renderLocationList() {
         );
     }
 
+    // Sort by admin-defined order
+    filteredLocations.sort((a, b) => (a.order || 0) - (b.order || 0));
+
     // Update count
     const countEl = document.getElementById('locationCount');
     if (countEl) {

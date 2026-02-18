@@ -141,19 +141,23 @@ function renderTable(data = LOCATIONS) {
     tbody.innerHTML = '';
 
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #888;">Tidak ada data yang cocok.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color: #888;">Tidak ada data yang cocok.</td></tr>';
         return;
     }
 
-    // Sort locations by ID descending (newest first)
-    const sortedLocations = [...data].sort((a, b) => b.id - a.id);
+    // Sort locations by order ascending (admin-defined order)
+    const sortedLocations = [...data].sort((a, b) => (a.order || 0) - (b.order || 0));
 
-    sortedLocations.forEach(loc => {
+    sortedLocations.forEach((loc, index) => {
         // Fallback if category was deleted or missing
         const catData = CATEGORIES[loc.category] || { name: loc.category, color: '#ccc' };
 
         const row = document.createElement('tr');
+        row.dataset.id = loc.id;
         row.innerHTML = `
+      <td style="text-align:center; min-width: 60px;">
+        <span class="drag-handle" title="Seret untuk mengubah urutan">⠿ <span class="order-number">${index + 1}</span></span>
+      </td>
       <td><strong>${loc.name}</strong></td>
       <td><span class="category-badge" style="background:${catData.color}; color:white; padding: 4px 10px; border-radius: 20px; font-size: 0.75em; font-weight: 500;">${catData.name}</span></td>
       <td>${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}</td>
@@ -164,6 +168,9 @@ function renderTable(data = LOCATIONS) {
     `;
         tbody.appendChild(row);
     });
+
+    // Initialize drag & drop
+    initSortable();
 }
 
 function populateCategories() {
@@ -380,4 +387,40 @@ function handleFormSubmit(e) {
     closeModal();
     filterData(); // Re-render with current filters
     showToast('Data berhasil disimpan!', 'success');
+}
+
+// === DRAG & DROP REORDER ===
+let sortableInstance = null;
+
+function initSortable() {
+    const tbody = document.getElementById('locationTableBody');
+    if (!tbody || tbody.children.length === 0) return;
+
+    // Destroy previous instance
+    if (sortableInstance) {
+        sortableInstance.destroy();
+    }
+
+    sortableInstance = new Sortable(tbody, {
+        handle: '.drag-handle',
+        animation: 200,
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        onEnd: function () {
+            // Read new order from DOM
+            const rows = tbody.querySelectorAll('tr[data-id]');
+            rows.forEach((row, index) => {
+                const id = parseInt(row.dataset.id);
+                const loc = LOCATIONS.find(l => l.id === id);
+                if (loc) {
+                    loc.order = index;
+                }
+                // Update the order number badge
+                const badge = row.querySelector('.order-number');
+                if (badge) badge.textContent = index + 1;
+            });
+            saveLocations(LOCATIONS);
+            showToast('Urutan berhasil diperbarui!', 'success');
+        }
+    });
 }
