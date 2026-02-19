@@ -6,19 +6,21 @@
 let activeFilter = 'all';
 let searchQuery = '';
 
-// Initialize UI
+// Initialize UI — wait for Firebase data
 document.addEventListener('DOMContentLoaded', () => {
-    renderFilterButtons();
-    renderLocationList();
-    updateStats();
-    setupSearch();
-    setupSidebarToggle();
-    setupLegend();
+    onDataReady(() => {
+        renderFilterButtons();
+        renderLocationList();
+        updateStats();
+        setupSearch();
+        setupSidebarToggle();
+        setupLegend();
 
-    // Auto-collapse sidebar on mobile
-    if (window.innerWidth <= 768) {
-        document.getElementById('sidebar').classList.add('collapsed');
-    }
+        // Auto-collapse sidebar on mobile
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.add('collapsed');
+        }
+    });
 });
 
 // === STATISTICS ===

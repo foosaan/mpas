@@ -1,19 +1,21 @@
 /**
  * Data Lokasi Wisata Kampung Wisata Purbayan, Kotagede, Yogyakarta
  * Sistem Informasi Geografis (SIG) Pemetaan
- * Updated: Real Data from Google My Maps + User Corrections
+ * Firebase Realtime Database Integration
  */
+
+const FIREBASE_DB_URL = 'https://maps-purbayan-default-rtdb.asia-southeast1.firebasedatabase.app';
 
 const PURBAYAN_CENTER = { lat: -7.8280, lng: 110.4000 };
 const DEFAULT_ZOOM = 16;
 
-// Data Kategori
-let CATEGORIES = {
+// Data Kategori (default)
+const DEFAULT_CATEGORIES = {
   wisata: {
     id: 'wisata',
     name: 'Wisata Purbayan',
-    icon: '🏛️', // Castle/Heritage icon
-    color: '#d97706', // Amber-600
+    icon: '🏛️',
+    color: '#d97706',
     markerColor: '#d97706',
     description: 'Situs sejarah, pasar, dan bangunan cagar budaya'
   },
@@ -21,15 +23,14 @@ let CATEGORIES = {
     id: 'umkm',
     name: 'UMKM Kampung Wisata',
     icon: '🛍️',
-    color: '#0284c7', // Sky-600
+    color: '#0284c7',
     markerColor: '#0284c7',
     description: 'Pusat oleh-oleh, kerajinan perak, batik, dan kuliner'
   }
 };
 
-// Data Lokasi Real
-let LOCATIONS = [
-  // --- WISATA PURBAYAN ---
+// Data Lokasi Default
+const DEFAULT_LOCATIONS = [
   {
     id: 1,
     name: 'Masjid Gedhe Mataram Kotagede',
@@ -156,8 +157,6 @@ let LOCATIONS = [
     tags: ['pasar', 'wisata', 'seni', 'kuliner'],
     order: 8
   },
-
-  // --- UMKM KAMPUNG WISATA ---
   {
     id: 9,
     name: 'Roti Kembang Waru Eko 521',
@@ -244,22 +243,66 @@ let LOCATIONS = [
   }
 ];
 
-// === INITIALIZATION ===
-// Load Data and Categories from LocalStorage or use Defaults
-function initData() {
+// === ACTIVE DATA (will be populated from Firebase or defaults) ===
+let CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+let LOCATIONS = JSON.parse(JSON.stringify(DEFAULT_LOCATIONS));
+
+// === FIREBASE HELPER FUNCTIONS ===
+
+async function firebaseGet(path) {
   try {
-    // 1. Load Categories
-    const savedCategories = localStorage.getItem('purbayan_categories_v3'); // NEW KEY v3
-    if (savedCategories) {
-      CATEGORIES = JSON.parse(savedCategories);
+    const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    console.error(`Firebase GET error (${path}):`, e);
+    return null;
+  }
+}
+
+async function firebasePut(path, data) {
+  try {
+    const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return true;
+  } catch (e) {
+    console.error(`Firebase PUT error (${path}):`, e);
+    return false;
+  }
+}
+
+// === INITIALIZATION ===
+let dataReady = false;
+let onDataReadyCallbacks = [];
+
+function onDataReady(callback) {
+  if (dataReady) {
+    callback();
+  } else {
+    onDataReadyCallbacks.push(callback);
+  }
+}
+
+async function initData() {
+  try {
+    // 1. Load Categories from Firebase
+    const fbCategories = await firebaseGet('categories');
+    if (fbCategories && Object.keys(fbCategories).length > 0) {
+      CATEGORIES = fbCategories;
     } else {
-      localStorage.setItem('purbayan_categories_v3', JSON.stringify(CATEGORIES));
+      // First time: seed Firebase with default data
+      await firebasePut('categories', DEFAULT_CATEGORIES);
+      CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
     }
 
-    // 2. Load Locations
-    const savedLocations = localStorage.getItem('purbayan_locations_v7'); // NEW KEY v7 (Order support)
-    if (savedLocations) {
-      LOCATIONS = JSON.parse(savedLocations);
+    // 2. Load Locations from Firebase
+    const fbLocations = await firebaseGet('locations');
+    if (fbLocations && fbLocations.length > 0) {
+      LOCATIONS = fbLocations;
       // Auto-assign order for locations that don't have it
       let needsSave = false;
       LOCATIONS.forEach((loc, i) => {
@@ -269,37 +312,82 @@ function initData() {
         }
       });
       if (needsSave) {
-        localStorage.setItem('purbayan_locations_v7', JSON.stringify(LOCATIONS));
+        await firebasePut('locations', LOCATIONS);
       }
     } else {
-      localStorage.setItem('purbayan_locations_v7', JSON.stringify(LOCATIONS));
+      // First time: seed Firebase with default data
+      await firebasePut('locations', DEFAULT_LOCATIONS);
+      LOCATIONS = JSON.parse(JSON.stringify(DEFAULT_LOCATIONS));
     }
+
+    console.log(`✅ Data loaded from Firebase: ${LOCATIONS.length} locations, ${Object.keys(CATEGORIES).length} categories`);
   } catch (e) {
-    console.error('Error initialization data:', e);
+    console.error('Error loading Firebase data, using defaults:', e);
+    CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+    LOCATIONS = JSON.parse(JSON.stringify(DEFAULT_LOCATIONS));
+  }
+
+  // Signal that data is ready
+  dataReady = true;
+  onDataReadyCallbacks.forEach(cb => cb());
+  onDataReadyCallbacks = [];
+}
+
+// Start loading data immediately
+initData();
+
+// === POLLING FOR REALTIME UPDATES (for user-facing page) ===
+let pollingInterval = null;
+
+function startRealtimePolling(onUpdate) {
+  // Poll every 5 seconds for changes
+  pollingInterval = setInterval(async () => {
+    try {
+      const fbLocations = await firebaseGet('locations');
+      const fbCategories = await firebaseGet('categories');
+
+      let changed = false;
+
+      if (fbLocations && JSON.stringify(fbLocations) !== JSON.stringify(LOCATIONS)) {
+        LOCATIONS = fbLocations;
+        changed = true;
+      }
+
+      if (fbCategories && JSON.stringify(fbCategories) !== JSON.stringify(CATEGORIES)) {
+        CATEGORIES = fbCategories;
+        changed = true;
+      }
+
+      if (changed && onUpdate) {
+        onUpdate();
+      }
+    } catch (e) {
+      console.error('Polling error:', e);
+    }
+  }, 5000);
+}
+
+function stopRealtimePolling() {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+    pollingInterval = null;
   }
 }
 
-// Call init immediately
-initData();
-
-
 // === DATA MANAGEMENT FUNCTIONS (FOR ADMIN) ===
 
-// Save Locations
-function saveLocations(data) {
+async function saveLocations(data) {
   LOCATIONS = data;
-  localStorage.setItem('purbayan_locations_v7', JSON.stringify(LOCATIONS));
+  await firebasePut('locations', LOCATIONS);
 }
 
-// Save Categories
-function saveCategories(data) {
+async function saveCategories(data) {
   CATEGORIES = data;
-  localStorage.setItem('purbayan_categories_v3', JSON.stringify(CATEGORIES));
+  await firebasePut('categories', CATEGORIES);
 }
 
-// Add New Category
-function addCategory(id, name, color, icon = '📍') {
-  if (CATEGORIES[id]) return false; // Exists
+async function addCategory(id, name, color, icon = '📍') {
+  if (CATEGORIES[id]) return false;
 
   CATEGORIES[id] = {
     id: id,
@@ -309,50 +397,44 @@ function addCategory(id, name, color, icon = '📍') {
     markerColor: color,
     description: ''
   };
-  saveCategories(CATEGORIES);
+  await saveCategories(CATEGORIES);
   return true;
 }
 
-// Add new location
-function addLocation(newLocation) {
+async function addLocation(newLocation) {
   if (!newLocation.id) {
     newLocation.id = Date.now();
   }
-  // Assign order to the end if not set
   if (newLocation.order === undefined || newLocation.order === null) {
     const maxOrder = LOCATIONS.reduce((max, l) => Math.max(max, l.order || 0), -1);
     newLocation.order = maxOrder + 1;
   }
   LOCATIONS.push(newLocation);
-  saveLocations(LOCATIONS);
+  await saveLocations(LOCATIONS);
   return newLocation;
 }
 
-// Update existing location
-function updateLocation(updatedLocation) {
+async function updateLocation(updatedLocation) {
   const index = LOCATIONS.findIndex(l => l.id == updatedLocation.id);
   if (index !== -1) {
-    // Preserve order if not explicitly set in the update
     if (updatedLocation.order === undefined || updatedLocation.order === null) {
       updatedLocation.order = LOCATIONS[index].order;
     }
     LOCATIONS[index] = updatedLocation;
-    saveLocations(LOCATIONS);
+    await saveLocations(LOCATIONS);
     return true;
   }
   return false;
 }
 
-// Delete location
-function deleteLocation(id) {
+async function deleteLocation(id) {
   LOCATIONS = LOCATIONS.filter(l => l.id != id);
   normalizeOrder();
-  saveLocations(LOCATIONS);
+  await saveLocations(LOCATIONS);
 }
 
 // === ORDER MANAGEMENT FUNCTIONS ===
 
-// Normalize order values (0, 1, 2, ...)
 function normalizeOrder() {
   LOCATIONS.sort((a, b) => (a.order || 0) - (b.order || 0));
   LOCATIONS.forEach((loc, i) => {
@@ -360,48 +442,43 @@ function normalizeOrder() {
   });
 }
 
-// Move location to the very top (order = 0)
-function moveLocationToTop(id) {
+async function moveLocationToTop(id) {
   const loc = LOCATIONS.find(l => l.id == id);
   if (!loc) return;
-  loc.order = -1; // Temporarily set to -1
+  loc.order = -1;
   normalizeOrder();
-  saveLocations(LOCATIONS);
+  await saveLocations(LOCATIONS);
 }
 
-// Move location up by one position
-function moveLocationUp(id) {
+async function moveLocationUp(id) {
   const sorted = [...LOCATIONS].sort((a, b) => (a.order || 0) - (b.order || 0));
   const idx = sorted.findIndex(l => l.id == id);
-  if (idx <= 0) return; // Already at top
+  if (idx <= 0) return;
 
-  // Swap orders
   const temp = sorted[idx].order;
   sorted[idx].order = sorted[idx - 1].order;
   sorted[idx - 1].order = temp;
 
-  saveLocations(LOCATIONS);
+  await saveLocations(LOCATIONS);
 }
 
-// Move location down by one position
-function moveLocationDown(id) {
+async function moveLocationDown(id) {
   const sorted = [...LOCATIONS].sort((a, b) => (a.order || 0) - (b.order || 0));
   const idx = sorted.findIndex(l => l.id == id);
-  if (idx === -1 || idx >= sorted.length - 1) return; // Already at bottom
+  if (idx === -1 || idx >= sorted.length - 1) return;
 
-  // Swap orders
   const temp = sorted[idx].order;
   sorted[idx].order = sorted[idx + 1].order;
   sorted[idx + 1].order = temp;
 
-  saveLocations(LOCATIONS);
+  await saveLocations(LOCATIONS);
 }
 
-// Reset data to defaults
-function resetData() {
-  if (confirm('Reset data akan mengembalikan Kategori dan Lokasi ke kondisi awal (2 Kategori utama). Lanjutkan?')) {
-    localStorage.removeItem('purbayan_categories_v3');
-    localStorage.removeItem('purbayan_locations_v7');
+// Reset data to defaults (also resets Firebase)
+async function resetData() {
+  if (confirm('Reset data akan mengembalikan Kategori dan Lokasi ke kondisi awal. Data di Firebase juga akan di-reset. Lanjutkan?')) {
+    await firebasePut('categories', DEFAULT_CATEGORIES);
+    await firebasePut('locations', DEFAULT_LOCATIONS);
     location.reload();
   }
 }

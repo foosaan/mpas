@@ -280,20 +280,27 @@ function focusLocation(locationId) {
     }
 }
 
-// Fit map to show all visible markers
-function fitToMarkers() {
-    const layers = [];
-    markersLayer.eachLayer(layer => layers.push(layer));
-
-    if (layers.length > 0) {
-        const group = L.featureGroup(layers);
-        map.fitBounds(group.getBounds().pad(0.1), { animate: true });
-    }
+// Refresh markers when data changes (called by realtime polling)
+function refreshMarkers() {
+    if (!map || !markersLayer) return;
+    addMarkers();
 }
 
-// Initialize on DOM ready
+// Initialize on DOM ready — wait for Firebase data
 document.addEventListener('DOMContentLoaded', () => {
-    initMap();
+    onDataReady(() => {
+        initMap();
+
+        // Start polling for realtime updates from Firebase
+        startRealtimePolling(() => {
+            refreshMarkers();
+            // Also refresh UI if functions exist
+            if (typeof renderLocationList === 'function') renderLocationList();
+            if (typeof renderFilterButtons === 'function') renderFilterButtons();
+            if (typeof updateStats === 'function') updateStats();
+            if (typeof setupLegend === 'function') setupLegend();
+        });
+    });
 
     // Safety fallback: Ensure loading overlay is hidden even if map init has issues
     setTimeout(() => {
@@ -304,5 +311,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 loading.style.display = 'none';
             }, 500);
         }
-    }, 2000); // 2 second max loading time
+    }, 4000); // Extended to 4s to allow Firebase loading
 });

@@ -27,9 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initial Render
-    renderTable();
-    populateCategories();
+    // Wait for Firebase data before rendering admin content
+    onDataReady(() => {
+        renderTable();
+        populateCategories();
+    });
 
     // Event Listeners for Search & Filter
     document.getElementById('searchInput').addEventListener('input', filterData);
@@ -337,15 +339,15 @@ function editLocation(id) {
     }, 200);
 }
 
-function removeLocation(id) {
+async function removeLocation(id) {
     if (confirm('Apakah Anda yakin ingin menghapus lokasi ini?')) {
-        deleteLocation(id);
+        await deleteLocation(id);
         filterData(); // Re-render with current filters
         showToast('Lokasi berhasil dihapus', 'success');
     }
 }
 
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
 
     let categoryId = document.getElementById('category').value;
@@ -370,7 +372,7 @@ function handleFormSubmit(e) {
         }
 
         // Add to data
-        addCategory(id, name, color, icon);
+        await addCategory(id, name, color, icon);
         categoryId = id;
 
         // Refresh dropdowns
@@ -397,9 +399,9 @@ function handleFormSubmit(e) {
     lastModifiedId = formData.id;
 
     if (currentId) {
-        updateLocation(formData);
+        await updateLocation(formData);
     } else {
-        addLocation(formData);
+        await addLocation(formData);
     }
 
     closeModal();
@@ -430,7 +432,7 @@ function initSortable() {
         animation: 200,
         ghostClass: 'sortable-ghost',
         chosenClass: 'sortable-chosen',
-        onEnd: function () {
+        onEnd: async function () {
             // Read new order from DOM
             const rows = tbody.querySelectorAll('tr[data-id]');
             rows.forEach((row, index) => {
@@ -443,7 +445,7 @@ function initSortable() {
                 const badge = row.querySelector('.order-number');
                 if (badge) badge.textContent = index + 1;
             });
-            saveLocations(LOCATIONS);
+            await saveLocations(LOCATIONS);
             showToast('Urutan berhasil diperbarui!', 'success');
         }
     });
