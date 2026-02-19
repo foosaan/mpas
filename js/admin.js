@@ -317,6 +317,9 @@ function editLocation(id) {
     if (document.getElementById('phone')) {
         document.getElementById('phone').value = loc.phone || '-';
     }
+    if (document.getElementById('tags')) {
+        document.getElementById('tags').value = (loc.tags || []).join(', ');
+    }
 
     openModal(true);
 
@@ -378,7 +381,9 @@ function handleFormSubmit(e) {
         openHours: document.getElementById('openHours').value,
         phone: document.getElementById('phone') ? document.getElementById('phone').value : '-',
         image: document.getElementById('image').value,
-        tags: [] // Simplified for now
+        tags: document.getElementById('tags')
+            ? document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t.length > 0)
+            : []
     };
 
     if (currentId) {
