@@ -6,6 +6,7 @@
 let map;
 let marker;
 let currentId = null;
+let lastModifiedId = null; // Track last saved item for highlight
 
 // Simple PIN for demo purposes
 const ADMIN_PIN = "1234";
@@ -158,7 +159,7 @@ function renderTable(data = LOCATIONS) {
       <td style="text-align:center; min-width: 60px;">
         <span class="drag-handle" title="Seret untuk mengubah urutan">⠿ <span class="order-number">${index + 1}</span></span>
       </td>
-      <td><strong>${loc.name}</strong></td>
+      <td><strong>${loc.name}</strong>${loc.id === lastModifiedId ? ' <span class="modified-badge">✅ Diubah</span>' : ''}</td>
       <td><span class="category-badge" style="background:${catData.color}; color:white; padding: 4px 10px; border-radius: 20px; font-size: 0.75em; font-weight: 500;">${catData.name}</span></td>
       <td>${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}</td>
       <td>
@@ -167,6 +168,12 @@ function renderTable(data = LOCATIONS) {
       </td>
     `;
         tbody.appendChild(row);
+
+        // Highlight row if it was just modified
+        if (loc.id === lastModifiedId) {
+            row.classList.add('row-highlight');
+            setTimeout(() => row.classList.remove('row-highlight'), 3000);
+        }
     });
 
     // Initialize drag & drop
@@ -386,6 +393,9 @@ function handleFormSubmit(e) {
             : []
     };
 
+    // Track which item was modified for highlight
+    lastModifiedId = formData.id;
+
     if (currentId) {
         updateLocation(formData);
     } else {
@@ -394,7 +404,13 @@ function handleFormSubmit(e) {
 
     closeModal();
     filterData(); // Re-render with current filters
-    showToast('Data berhasil disimpan!', 'success');
+    showToast(`Data "${formData.name}" berhasil ${currentId ? 'diperbarui' : 'ditambahkan'}!`, 'success');
+
+    // Clear modified badge after 5 seconds
+    setTimeout(() => {
+        lastModifiedId = null;
+        filterData();
+    }, 5000);
 }
 
 // === DRAG & DROP REORDER ===
