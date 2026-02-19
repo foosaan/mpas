@@ -207,8 +207,7 @@ function populateCategories() {
 function initMap() {
     if (map) return;
 
-    // 1. Define Base Layers
-    // 1. Define Base Layers
+    // Define Base Layers
     const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | foosaan',
         maxZoom: 19
@@ -315,6 +314,9 @@ function editLocation(id) {
     document.getElementById('address').value = loc.address || '';
     document.getElementById('openHours').value = loc.openHours || '';
     document.getElementById('image').value = loc.image || '';
+    if (document.getElementById('phone')) {
+        document.getElementById('phone').value = loc.phone || '-';
+    }
 
     openModal(true);
 
@@ -374,6 +376,7 @@ function handleFormSubmit(e) {
         description: document.getElementById('description').value,
         address: document.getElementById('address').value,
         openHours: document.getElementById('openHours').value,
+        phone: document.getElementById('phone') ? document.getElementById('phone').value : '-',
         image: document.getElementById('image').value,
         tags: [] // Simplified for now
     };

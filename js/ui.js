@@ -70,8 +70,8 @@ function setFilter(filter) {
     // Re-render location list
     renderLocationList();
 
-    // Close any open info window
-    closeInfoWindow();
+    // Close any open popup and detail panel
+    if (typeof map !== 'undefined' && map) map.closePopup();
     closeDetailPanel();
 }
 
@@ -125,9 +125,11 @@ function filterMapBySearch() {
         const matchesFilter = activeFilter === 'all' || loc.category === activeFilter;
 
         if (matchesSearch && matchesFilter) {
-            marker.setMap(map);
+            if (!markersLayer.hasLayer(marker)) {
+                markersLayer.addLayer(marker);
+            }
         } else {
-            marker.setMap(null);
+            markersLayer.removeLayer(marker);
         }
     });
 }
@@ -324,6 +326,20 @@ function setupLegend() {
             const legend = document.querySelector('.map-legend');
             if (legend) legend.classList.toggle('collapsed');
         });
+    }
+
+    // Dynamically render legend items from CATEGORIES
+    const legendBody = document.getElementById('legendBody');
+    if (legendBody) {
+        let html = '';
+        Object.values(CATEGORIES).forEach(cat => {
+            html += `
+            <div class="legend-item">
+              <span class="legend-dot" style="background: ${cat.color};"></span>
+              <span>${cat.icon} ${cat.name}</span>
+            </div>`;
+        });
+        legendBody.innerHTML = html;
     }
 }
 

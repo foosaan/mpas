@@ -64,7 +64,7 @@ let LOCATIONS = [
     category: 'wisata',
     lat: -7.827725,
     lng: 110.400512,
-    description: 'Pasar tradisional tertua di Yogyakarta yang sduah ada sejak jaman Kerajaan Mataram Islam (Sargede).',
+    description: 'Pasar tradisional tertua di Yogyakarta yang sudah ada sejak jaman Kerajaan Mataram Islam (Sargede).',
     address: 'Jl. Mentaok Raya, Purbayan, Kotagede',
     image: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Pasar_Kotagede.jpg',
     phone: '-',

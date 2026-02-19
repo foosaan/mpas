@@ -45,8 +45,7 @@ function createMarkerIcon(color, icon, isActive = false) {
 // Initialize the map
 function initMap() {
     // Create Leaflet map
-    // 1. Define Base Layers
-    // 1. Define Base Layers
+    // Define Base Layers
     const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | foosaan',
         maxZoom: 19
@@ -133,7 +132,6 @@ function addMarkers() {
             autoPan: true
         });
 
-        // Marker click handler
         // Marker click handler
         let lastClickTime = 0;
         const onMarkerClick = (e) => {
